@@ -305,3 +305,49 @@ exports.updateProfile = async (req, res) => {
     message: "Profile updated successfully!",
   });
 };
+
+exports.toggleFavorite = async (req, res) => {
+  const { movieId } = req.body;
+  const userId = req.user._id;
+
+  if (!isValidObjectId(movieId)) return sendError(res, "Invalid movie!");
+
+  const user = await User.findById(userId);
+  if (!user) return sendError(res, "User not found!");
+
+  const index = user.favorites.indexOf(movieId);
+
+  if (index === -1) {
+    user.favorites.push(movieId);
+  } else {
+    user.favorites.splice(index, 1);
+  }
+
+  await user.save();
+
+  res.json({
+    message: index === -1 ? "Added to favorites!" : "Removed from favorites!",
+    favorites: user.favorites,
+  });
+};
+
+exports.getFavorites = async (req, res) => {
+  const userId = req.user._id;
+
+  const user = await User.findById(userId).populate("favorites");
+
+  const favorites = user.favorites.map((m) => ({
+    id: m._id,
+    title: m.title,
+    poster: m.poster?.url,
+    responsivePosters: m.poster?.responsive,
+    genres: m.genres,
+    status: m.status,
+    reviews: {
+      ratingAvg: m.reviewStats?.ratingAvg,
+      reviewCount: m.reviewStats?.reviewCount,
+    },
+  }));
+
+  res.json({ movies: favorites });
+};

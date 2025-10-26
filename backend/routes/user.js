@@ -9,6 +9,8 @@ const {
   signIn,
   uploadAvatar,
   updateProfile,
+  toggleFavorite,
+  getFavorites,
 } = require("../controllers/user");
 const { uploadImage } = require("../middlewares/multer");
 const { isAuth } = require("../middlewares/auth");
@@ -28,6 +30,8 @@ router.post("/verify-email", verifyEmail);
 router.post("/resend-email-verification-token", resendEmailVerificationToken);
 router.post("/forget-password", forgetPassword);
 router.patch("/update-profile", isAuth, updateProfile);
+router.post("/toggle-favorite", isAuth, toggleFavorite);
+router.get("/favorites", isAuth, getFavorites);
 router.post(
   "/verify-pass-reset-token",
   isValidPassResetToken,
@@ -56,6 +60,7 @@ router.get("/is-auth", isAuth, (req, res) => {
       isVerified: user.isVerified,
       role: user.role,
       avatar: user.avatar,
+      favorites: user.favorites,
     },
   });
 });

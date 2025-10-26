@@ -20,7 +20,7 @@ export default function NotVerified() {
           Hello, your account is not verified
           <button
             onClick={navigateToVerification}
-            className="font-semibold text-blue-500 hover:underline"
+            className="ml-1 font-semibold text-blue-500 hover:underline"
           >
             click to verify your account
           </button>

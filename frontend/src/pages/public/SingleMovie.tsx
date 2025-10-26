@@ -1,9 +1,10 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { FiChevronsUp } from 'react-icons/fi';
+import { MdFavoriteBorder, MdFavorite } from 'react-icons/md';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import { getSingleMovie } from '@/api/movie';
-import { useNotification } from '@/hooks';
+import { useAuth, useNotification } from '@/hooks';
 import type { Actor, Movie } from '@/types';
 import { getEmbedUrl } from '@/utils/helper';
 
@@ -44,6 +45,7 @@ export default function SingleMovie() {
   const [movie, setMovie] = useState<Movie | undefined>(undefined);
 
   const { movieId } = useParams();
+  const { authInfo, handleToggleFavorite } = useAuth();
   const { updateNotification } = useNotification();
   const navigate = useNavigate();
   useEffect(() => {
@@ -102,6 +104,10 @@ export default function SingleMovie() {
     setMovie({ ...movie, reviews });
   };
 
+  const handleFavorite = async () => {
+    await handleToggleFavorite(movieId || '');
+    setMovie({ ...movie, isFavorite: !movie.isFavorite });
+  };
   const {
     trailer,
     poster,
@@ -149,10 +155,19 @@ export default function SingleMovie() {
             />
           </div>
           <div className="flex w-full flex-col">
-            <div className="mb-3 flex w-full items-center border-b">
+            <div className="mb-3 flex w-full items-center justify-between border-b">
               <h1 className="py-3 text-2xl font-semibold text-highlight dark:text-highlight-dark lg:text-3xl xl:text-4xl">
                 {title}
               </h1>
+              {authInfo.isLoggedIn && (
+                <button onClick={handleFavorite}>
+                  {movie.isFavorite ? (
+                    <MdFavorite className="size-6 text-red-500" />
+                  ) : (
+                    <MdFavoriteBorder className="size-6 text-red-500" />
+                  )}
+                </button>
+              )}
             </div>
             <RatingStar rating={reviews?.ratingAvg} />
             <ListWithLabel label="Directors:">

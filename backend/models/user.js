@@ -33,6 +33,12 @@ const userSchema = mongoose.Schema({
     url: String,
     public_id: String,
   },
+  favorites: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Movie",
+    },
+  ],
 });
 
 userSchema.pre("save", async function (next) {

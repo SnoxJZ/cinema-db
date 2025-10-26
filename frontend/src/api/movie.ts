@@ -210,8 +210,13 @@ export const getLatestUploads = async (
 export const getSingleMovie = async (
   id: string,
 ): Promise<ApiResponse<{ movie: Movie }>> => {
+  const token = getToken();
   try {
-    const { data } = await client('/movie/single/' + id);
+    const { data } = await client('/movie/single/' + id, {
+      headers: {
+        authorization: 'Bearer ' + token,
+      },
+    });
     return { data, error: undefined };
   } catch (error) {
     return {

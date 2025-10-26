@@ -6,6 +6,7 @@ import type { User } from '@/types';
 import {
   getIsAuth,
   signInUser,
+  toggleFavorite,
   updateProfile,
   uploadAvatar,
 } from '../api/auth';
@@ -35,6 +36,7 @@ interface AuthContext {
     oldPassword?: string;
     newPassword?: string;
   }) => Promise<void>;
+  handleToggleFavorite: (movieId: string) => Promise<void>;
 }
 
 export const AuthContext = createContext<AuthContext | null>(null);
@@ -132,6 +134,25 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     updateNotification('success', 'Profile updated!');
   };
 
+  const handleToggleFavorite = async (movieId: string) => {
+    const { data, error } = await toggleFavorite(movieId);
+    if (error || !data) {
+      updateNotification('error', error || 'Error');
+      return;
+    }
+
+    setAuthInfo({
+      ...authInfo,
+      profile: authInfo.profile
+        ? {
+            ...authInfo.profile,
+            favorites: data.favorites,
+          }
+        : null,
+    });
+    updateNotification('success', data.message);
+  };
+
   useEffect(() => {
     isAuth();
   }, []);
@@ -145,6 +166,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
         isAuth,
         handleUpdateAvatar,
         handleUpdateProfile,
+        handleToggleFavorite,
       }}
     >
       {children}

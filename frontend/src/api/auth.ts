@@ -1,4 +1,4 @@
-import type { User, ApiResponse } from '@/types';
+import type { User, ApiResponse, MovieListItem } from '@/types';
 
 import { catchError, getToken } from '../utils/helper';
 
@@ -155,8 +155,8 @@ export const uploadAvatar = async (
 export const updateProfile = async (profileInfo: {
   name: string;
   email: string;
-  oldPassword: string;
-  newPassword: string;
+  oldPassword?: string;
+  newPassword?: string;
 }): Promise<ApiResponse<User>> => {
   const token = getToken();
   try {
@@ -166,6 +166,48 @@ export const updateProfile = async (profileInfo: {
       },
     });
     return { data: data.user, error: undefined };
+  } catch (error) {
+    return {
+      data: undefined,
+      error: catchError(error).error || 'An error occurred',
+    };
+  }
+};
+
+export const toggleFavorite = async (
+  movieId: string,
+): Promise<ApiResponse<{ message: string; favorites: string[] }>> => {
+  const token = getToken();
+  try {
+    const { data } = await client.post(
+      '/user/toggle-favorite',
+      { movieId },
+      {
+        headers: {
+          authorization: 'Bearer ' + token,
+        },
+      },
+    );
+    return { data, error: undefined };
+  } catch (error) {
+    return {
+      data: undefined,
+      error: catchError(error).error || 'An error occurred',
+    };
+  }
+};
+
+export const getFavorites = async (): Promise<
+  ApiResponse<{ movies: MovieListItem[] }>
+> => {
+  const token = getToken();
+  try {
+    const { data } = await client.get('/user/favorites', {
+      headers: {
+        authorization: 'Bearer ' + token,
+      },
+    });
+    return { data, error: undefined };
   } catch (error) {
     return {
       data: undefined,

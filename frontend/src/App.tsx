@@ -11,6 +11,7 @@ import { useAuth } from './hooks';
 import AdminNavigator from './navigator/AdminNavigator';
 import ConfirmPassword from './pages/auth/ConfirmPassword';
 import EmailVerification from './pages/auth/EmailVerification';
+import Favorites from './pages/auth/Favorites';
 import ForgetPassword from './pages/auth/ForgetPassword';
 import Signin from './pages/auth/Signin';
 import Signup from './pages/auth/Signup';
@@ -45,6 +46,7 @@ export default function App() {
         <Route path="/movie/:movieId" element={<SingleMovie />} />
         <Route path="/profile/:profileId" element={<ActorProfile />} />
         <Route path="/user/:userId" element={<UserProfile />} />
+        <Route path="/user/:userId/favorites" element={<Favorites />} />
         <Route path="/movie/search" element={<SearchMovies />} />
         <Route path="*" element={<NotFound />} />
       </Routes>

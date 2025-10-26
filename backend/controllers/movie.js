@@ -9,6 +9,7 @@ const {
 const cloudinary = require("../cloud");
 const Movie = require("../models/movie");
 const Review = require("../models/review");
+const User = require("../models/user");
 const { isValidObjectId } = require("mongoose");
 
 exports.uploadTrailer = async (req, res) => {
@@ -437,8 +438,6 @@ exports.getLatestUploads = async (req, res) => {
 exports.getSingleMovie = async (req, res) => {
   const { movieId } = req.params;
 
-  // mongoose.Types.ObjectId(movieId)
-
   if (!isValidObjectId(movieId))
     return sendError(res, "Movie id is not valid!");
 
@@ -447,6 +446,12 @@ exports.getSingleMovie = async (req, res) => {
   );
 
   if (!movie) return sendError(res, "Movie not found!", 404);
+
+  let isFavorite = false;
+  if (req.user) {
+    const user = await User.findById(req.user._id);
+    isFavorite = user.favorites.some((fav) => fav.toString() === movieId);
+  }
 
   const [aggregatedResponse] = await Review.aggregate(
     averageRatingPipeline(movie._id)
@@ -535,6 +540,7 @@ exports.getSingleMovie = async (req, res) => {
           }
         : null,
       reviews: { ...reviews },
+      isFavorite,
     },
   });
 };

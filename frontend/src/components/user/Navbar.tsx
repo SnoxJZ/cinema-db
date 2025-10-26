@@ -23,7 +23,7 @@ export default function Navbar() {
       <Container className="p-2">
         <div className="flex items-center justify-between">
           <Link to="/">
-            <img src="./logo.png" alt="" className="h-8 sm:h-10" />
+            <img src="/logo.png" alt="" className="h-8 sm:h-10" />
           </Link>
 
           <ul className="flex items-center space-x-2 sm:space-x-4">

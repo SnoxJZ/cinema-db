@@ -9,6 +9,12 @@ export interface User {
     url: string;
     public_id: string;
   };
+  favorites?: string[];
+  playlists?: {
+    id: string;
+    name: string;
+    movies: string[];
+  }[];
 }
 
 export type MovieType = 'Movie' | 'Web Series' | 'TV Series' | 'Documentary';
@@ -50,6 +56,7 @@ export interface Movie {
     reviewCount?: number;
     // reviews: Review[];
   };
+  isFavorite: boolean;
 }
 
 export type MovieFormT = Omit<

@@ -20,6 +20,21 @@ exports.isAuth = async (req, res, next) => {
   next();
 };
 
+exports.optionalAuth = async (req, res, next) => {
+  const token = req.headers?.authorization;
+
+  if (token) {
+    try {
+      const jwtToken = token.split("Bearer ")[1];
+      const decode = jwt.verify(jwtToken, process.env.JWT_SECRET);
+      const user = await User.findById(decode.userId);
+      if (user) req.user = user;
+    } catch (error) {}
+  }
+
+  next();
+};
+
 exports.isAdmin = async (req, res, next) => {
   const { user } = req;
   if (user.role !== "admin") return sendError(res, "Unauthorized access!");

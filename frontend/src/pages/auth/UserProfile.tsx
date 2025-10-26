@@ -1,4 +1,5 @@
 import { useRef } from 'react';
+import { Link } from 'react-router-dom';
 
 import Container from '@/components/Container';
 import Loading from '@/components/Loading';
@@ -35,11 +36,7 @@ const UserProfile = () => {
   return (
     <div className="min-h-screen bg-white pb-10 dark:bg-primary">
       <Container className="space-y-6 p-4 xl:px-0">
-        <div className="flex flex-col gap-6 md:flex-row">playlists</div>
         <div className="flex w-full flex-col gap-3">
-          <h2 className="text-xl font-semibold text-highlight dark:text-highlight-dark">
-            Settings
-          </h2>
           <form
             className="mx-auto flex flex-col items-start gap-10"
             onSubmit={handleUpdateUser}
@@ -191,6 +188,18 @@ const UserProfile = () => {
               <p className="text-sm text-red-500">{passwordError}</p>
             </div>
           </form>
+        </div>
+        <div className="flex w-full flex-col gap-3">
+          <h2 className="text-xl font-semibold text-highlight dark:text-highlight-dark">
+            Playlists
+          </h2>
+          <div className="flex flex-wrap gap-6">
+            <Link to={`/user/${profile.id}/favorites`}>
+              <div className="flex h-[200px] w-[150px] items-center justify-center rounded bg-gradient-to-br from-[#0D324D] to-[#7F5A83] text-lg text-slate-200">
+                Favorites ({profile?.favorites?.length || 0})
+              </div>
+            </Link>
+          </div>
         </div>
       </Container>
     </div>

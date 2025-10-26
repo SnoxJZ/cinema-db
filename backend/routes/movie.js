@@ -14,7 +14,7 @@ const {
   getTopRatedMovies,
   searchPublicMovies,
 } = require("../controllers/movie");
-const { isAuth, isAdmin } = require("../middlewares/auth");
+const { isAuth, isAdmin, optionalAuth } = require("../middlewares/auth");
 const { uploadVideo, uploadImage } = require("../middlewares/multer");
 const {
   validateMovie,
@@ -72,7 +72,7 @@ router.post("/enrich-all-actors", enrichAllActors);
 
 router.get("/movies", getMovies);
 router.get("/latest-uploads", getLatestUploads);
-router.get("/single/:movieId", getSingleMovie);
+router.get("/single/:movieId", optionalAuth, getSingleMovie);
 router.get("/related/:movieId", getRelatedMovies);
 router.get("/top-rated", getTopRatedMovies);
 router.get("/search-public", searchPublicMovies);
