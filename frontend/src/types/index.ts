@@ -5,6 +5,10 @@ export interface User {
   email: string;
   role: 'admin' | 'user';
   isVerified: boolean;
+  avatar?: {
+    url: string;
+    public_id: string;
+  };
 }
 
 export type MovieType = 'Movie' | 'Web Series' | 'TV Series' | 'Documentary';

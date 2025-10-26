@@ -1,6 +1,6 @@
 import type { User, ApiResponse } from '@/types';
 
-import { catchError } from '../utils/helper';
+import { catchError, getToken } from '../utils/helper';
 
 import client from './client';
 
@@ -125,6 +125,47 @@ export const resendEmailVerificationToken = async (
       { userId },
     );
     return { data, error: undefined };
+  } catch (error) {
+    return {
+      data: undefined,
+      error: catchError(error).error || 'An error occurred',
+    };
+  }
+};
+
+export const uploadAvatar = async (
+  formData: FormData,
+): Promise<ApiResponse<User>> => {
+  const token = getToken();
+  try {
+    const { data } = await client.post('/user/upload-avatar', formData, {
+      headers: {
+        authorization: 'Bearer ' + token,
+      },
+    });
+    return { data: data.user, error: undefined };
+  } catch (error) {
+    return {
+      data: undefined,
+      error: catchError(error).error || 'An error occurred',
+    };
+  }
+};
+
+export const updateProfile = async (profileInfo: {
+  name: string;
+  email: string;
+  oldPassword: string;
+  newPassword: string;
+}): Promise<ApiResponse<User>> => {
+  const token = getToken();
+  try {
+    const { data } = await client.patch('/user/update-profile', profileInfo, {
+      headers: {
+        authorization: 'Bearer ' + token,
+      },
+    });
+    return { data: data.user, error: undefined };
   } catch (error) {
     return {
       data: undefined,

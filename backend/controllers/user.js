@@ -5,6 +5,7 @@ const { isValidObjectId } = require("mongoose");
 const { generateOTP, generateMailTransporter } = require("../utils/mail");
 const { sendError, generateRandomByte } = require("../utils/helper");
 const PasswordResetToken = require("../models/passwordResetToken");
+const cloudinary = require("../cloud");
 
 exports.create = async (req, res) => {
   const { name, email, password } = req.body;
@@ -215,5 +216,92 @@ exports.signIn = async (req, res) => {
 
   res.json({
     user: { id: _id, name, email, role, token: jwtToken, isVerified },
+  });
+};
+
+exports.uploadAvatar = async (req, res) => {
+  const { file } = req;
+  const userId = req.user._id;
+
+  if (!file) return sendError(res, "Avatar file is missing!");
+
+  const user = await User.findById(userId);
+  if (!user) return sendError(res, "User not found!");
+
+  if (user.avatar?.public_id) {
+    await cloudinary.uploader.destroy(user.avatar.public_id);
+  }
+
+  const { secure_url, public_id } = await cloudinary.uploader.upload(
+    file.path,
+    {
+      folder: "avatars",
+      width: 300,
+      height: 300,
+      crop: "fill",
+      gravity: "face",
+    }
+  );
+
+  user.avatar = { url: secure_url, public_id };
+  await user.save();
+
+  res.json({
+    user: {
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      isVerified: user.isVerified,
+      avatar: user.avatar,
+    },
+  });
+};
+
+exports.updateProfile = async (req, res) => {
+  const { name, email, oldPassword, newPassword } = req.body;
+  const userId = req.user._id;
+
+  const user = await User.findById(userId);
+  if (!user) return sendError(res, "User not found!");
+
+  if (name && name !== user.name) {
+    user.name = name.trim();
+  }
+
+  if (email && email !== user.email) {
+    const emailExists = await User.findOne({ email });
+    if (emailExists) return sendError(res, "Email already in use!");
+
+    user.email = email.trim();
+    user.isVerified = false;
+  }
+
+  if (oldPassword && newPassword) {
+    const isValidPassword = await user.comparePassword(oldPassword);
+    if (!isValidPassword) return sendError(res, "Invalid old password!");
+
+    const isSamePassword = await user.comparePassword(newPassword);
+    if (isSamePassword)
+      return sendError(
+        res,
+        "New password must be different from old password!"
+      );
+
+    user.password = newPassword;
+  }
+
+  await user.save();
+
+  res.json({
+    user: {
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      isVerified: user.isVerified,
+      avatar: user.avatar,
+    },
+    message: "Profile updated successfully!",
   });
 };

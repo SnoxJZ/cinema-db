@@ -217,7 +217,6 @@ exports.updateMovie = async (req, res) => {
 
   // update poster
   if (file) {
-    // eğer varsa posteri buluttan kaldırmak.
     const posterID = movie.poster?.public_id;
     console.log(posterID);
     if (posterID) {

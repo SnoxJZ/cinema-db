@@ -28,6 +28,11 @@ const userSchema = mongoose.Schema({
     default: "user",
     enum: ["admin", "user"],
   },
+  avatar: {
+    type: Object,
+    url: String,
+    public_id: String,
+  },
 });
 
 userSchema.pre("save", async function (next) {

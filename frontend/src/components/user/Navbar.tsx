@@ -8,7 +8,7 @@ import AppSearchForm from '../form/AppSearchForm';
 export default function Navbar() {
   const { toggleTheme } = useTheme();
   const { authInfo, handleLogout } = useAuth();
-  const { isLoggedIn } = authInfo;
+  const { isLoggedIn, profile } = authInfo;
   const navigate = useNavigate();
   const handleLogoutAndRedirect = () => {
     handleLogout();
@@ -59,6 +59,23 @@ export default function Navbar() {
                 </Link>
               )}
             </li>
+            {isLoggedIn && (
+              <li>
+                <Link to={`/user/${profile?.id}`}>
+                  {profile?.avatar?.url ? (
+                    <img
+                      src={profile.avatar.url}
+                      alt="user avatar"
+                      className="size-8 rounded-full"
+                    />
+                  ) : (
+                    <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-purple-600 text-white">
+                      {profile?.name?.[0]}
+                    </div>
+                  )}
+                </Link>
+              </li>
+            )}
           </ul>
         </div>
       </Container>
