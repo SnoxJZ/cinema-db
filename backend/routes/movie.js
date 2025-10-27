@@ -14,6 +14,8 @@ const {
   getTopRatedMovies,
   searchPublicMovies,
 } = require("../controllers/movie");
+const { bulkImportMovies } = require("../bulkImportMovies");
+const { enrichAllActors } = require("../enrichAllActors");
 const { isAuth, isAdmin, optionalAuth } = require("../middlewares/auth");
 const { uploadVideo, uploadImage } = require("../middlewares/multer");
 const {
@@ -22,8 +24,6 @@ const {
   validateTrailer,
 } = require("../middlewares/validator");
 const { parseData } = require("../utils/helper");
-const { bulkImportMovies } = require("../controllers/bulkImportMovies");
-const { enrichAllActors } = require("../controllers/enrichAllActors");
 const router = express.Router();
 
 router.post(

@@ -1,5 +1,6 @@
 import { AiFillStar } from 'react-icons/ai';
-import { Link } from 'react-router-dom';
+import { FaRegTrashAlt } from 'react-icons/fa';
+import { Link, useNavigate } from 'react-router-dom';
 
 import type { MovieListItem } from '@/types';
 import { getPoster } from '@/utils/helper';
@@ -15,13 +16,15 @@ export default function MovieList({
   title,
   movies = [],
   link,
+  description,
+  onDelete,
 }: {
   title?: string;
   movies: MovieListItem[] | undefined;
   link?: string;
+  description?: string;
+  onDelete?: (movieId: string, e: React.MouseEvent<HTMLButtonElement>) => void;
 }) {
-  if (!movies.length) return null;
-
   return (
     <div>
       <div className="mb-5 flex items-end gap-4">
@@ -39,19 +42,40 @@ export default function MovieList({
           </Link>
         )}
       </div>
+      {description && (
+        <p className="text-sm text-gray-500 dark:text-gray-400">
+          {description}
+        </p>
+      )}
       <GridContainer>
         {movies.map((movie) => {
-          return <ListItem key={movie.id} movie={movie} />;
+          return <ListItem key={movie.id} movie={movie} onDelete={onDelete} />;
         })}
       </GridContainer>
     </div>
   );
 }
 
-const ListItem = ({ movie }: { movie: MovieListItem }) => {
+const ListItem = ({
+  movie,
+  onDelete,
+}: {
+  movie: MovieListItem;
+  onDelete?: (movieId: string, e: React.MouseEvent<HTMLButtonElement>) => void;
+}) => {
   const { id, responsivePosters, title, poster, reviews } = movie;
+  const navigate = useNavigate();
   return (
-    <Link to={'/movie/' + id}>
+    <div
+      onClick={() => navigate(`/movie/${id}`)}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          navigate(`/movie/${id}`);
+        }
+      }}
+    >
       {responsivePosters || poster ? (
         <img
           className="h-[250px] w-full object-contain"
@@ -63,12 +87,19 @@ const ListItem = ({ movie }: { movie: MovieListItem }) => {
           {title}
         </div>
       )}
-      <h1
-        className="text-lg font-semibold text-secondary dark:text-white"
-        title={title}
-      >
-        {trimTitle(title)}
-      </h1>
+      <div className="flex items-center gap-4">
+        <h3
+          className="text-lg font-semibold text-secondary dark:text-white"
+          title={title}
+        >
+          {trimTitle(title)}
+        </h3>
+        {onDelete && (
+          <button type="button" onClick={(e) => onDelete(id, e)}>
+            <FaRegTrashAlt className="size-4 text-red-500" />
+          </button>
+        )}
+      </div>
       {reviews?.ratingAvg ? (
         <p className="flex items-center space-x-1 text-highlight dark:text-highlight-dark">
           <span>{reviews?.ratingAvg}</span>
@@ -77,6 +108,6 @@ const ListItem = ({ movie }: { movie: MovieListItem }) => {
       ) : (
         <p className="text-highlight dark:text-highlight-dark">No reviews</p>
       )}
-    </Link>
+    </div>
   );
 };

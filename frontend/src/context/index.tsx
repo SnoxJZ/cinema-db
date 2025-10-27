@@ -3,6 +3,7 @@ import { type ReactNode } from 'react';
 import AuthProvider from './AuthProvider';
 import MoviesProvider from './MoviesProvider';
 import NotificationProvider from './NotificationProvider';
+import PlaylistProvider from './PlaylistProvider';
 import SearchProvider from './SearchProvider';
 import ThemeProvider from './ThemeProvider';
 
@@ -16,7 +17,9 @@ export default function ContextProviders({
       <SearchProvider>
         <MoviesProvider>
           <AuthProvider>
-            <ThemeProvider>{children}</ThemeProvider>
+            <PlaylistProvider>
+              <ThemeProvider>{children}</ThemeProvider>
+            </PlaylistProvider>
           </AuthProvider>
         </MoviesProvider>
       </SearchProvider>

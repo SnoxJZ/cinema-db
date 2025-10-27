@@ -3,6 +3,7 @@ import { useContext } from 'react';
 import { AuthContext } from '../context/AuthProvider';
 import { MovieContext } from '../context/MoviesProvider';
 import { NotificationContext } from '../context/NotificationProvider';
+import { PlaylistContext } from '../context/PlaylistProvider';
 import { SearchContext } from '../context/SearchProvider';
 import { ThemeContext } from '../context/ThemeProvider';
 
@@ -42,6 +43,14 @@ export const useMovies = () => {
   const context = useContext(MovieContext);
   if (!context) {
     throw new Error('useMovies must be used within MoviesProvider');
+  }
+  return context;
+};
+
+export const usePlaylist = () => {
+  const context = useContext(PlaylistContext);
+  if (!context) {
+    throw new Error('usePlaylist must be used within PlaylistProvider');
   }
   return context;
 };

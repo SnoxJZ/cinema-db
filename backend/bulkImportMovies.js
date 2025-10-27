@@ -1,8 +1,8 @@
-const { sendError } = require("../utils/helper");
-const Movie = require("../models/movie");
-const Review = require("../models/review");
-const Actor = require("../models/actor");
-const User = require("../models/user");
+const { sendError } = require("./utils/helper");
+const Movie = require("./models/movie");
+const Review = require("./models/review");
+const Actor = require("./models/actor");
+const User = require("./models/user");
 
 exports.bulkImportMovies = async (req, res) => {
   const TMDB_API_KEY = process.env.TMDB_API_KEY;

@@ -1,5 +1,5 @@
-const { sendError } = require("../utils/helper");
-const Actor = require("../models/actor");
+const { sendError } = require("./utils/helper");
+const Actor = require("./models/actor");
 
 exports.enrichAllActors = async (req, res) => {
   const TMDB_API_KEY = process.env.TMDB_API_KEY;

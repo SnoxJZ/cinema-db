@@ -1,16 +1,22 @@
-import { useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { useEffect, useRef, useState } from 'react';
+import { FaPlus, FaRegTrashAlt } from 'react-icons/fa';
+import { Link, useNavigate } from 'react-router-dom';
 
 import Container from '@/components/Container';
 import Loading from '@/components/Loading';
-import { useAuth } from '@/hooks';
+import PlaylistCreate from '@/components/models/PlaylistCreate';
+import { useAuth, usePlaylist } from '@/hooks';
 import { useUpdateUser } from '@/hooks/useUpdateUser';
 
 const UserProfile = () => {
   const { authInfo } = useAuth();
   const { profile } = authInfo;
-
+  const navigate = useNavigate();
+  const [showPlaylistCreate, setShowPlaylistCreate] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const { playlists, fetchPlaylists, isLoading, deletePlaylist } =
+    usePlaylist();
 
   const {
     selectedImage,
@@ -31,7 +37,19 @@ const UserProfile = () => {
     handleUpdateUser,
   } = useUpdateUser();
 
-  if (!profile) return <Loading />;
+  useEffect(() => {
+    fetchPlaylists();
+  }, []);
+
+  const handleDeletePlaylist = async (
+    e: React.MouseEvent<HTMLButtonElement>,
+    playlistId: string,
+  ) => {
+    e.stopPropagation();
+    await deletePlaylist(playlistId);
+  };
+
+  if (!profile || isLoading) return <Loading />;
 
   return (
     <div className="min-h-screen bg-white pb-10 dark:bg-primary">
@@ -189,19 +207,55 @@ const UserProfile = () => {
             </div>
           </form>
         </div>
+
         <div className="flex w-full flex-col gap-3">
-          <h2 className="text-xl font-semibold text-highlight dark:text-highlight-dark">
-            Playlists
-          </h2>
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-semibold text-highlight dark:text-highlight-dark">
+              Playlists
+            </h2>
+            <button
+              onClick={() => setShowPlaylistCreate(true)}
+              className="flex items-center gap-2 rounded-md border border-light-subtle px-2 py-1 text-sm dark:border-dark-subtle dark:text-white"
+            >
+              <FaPlus className="size-3" /> Create Playlist
+            </button>
+          </div>
           <div className="flex flex-wrap gap-6">
             <Link to={`/user/${profile.id}/favorites`}>
               <div className="flex h-[200px] w-[150px] items-center justify-center rounded bg-gradient-to-br from-[#0D324D] to-[#7F5A83] text-lg text-slate-200">
                 Favorites ({profile?.favorites?.length || 0})
               </div>
             </Link>
+            {playlists.map((playlist) => (
+              <div
+                key={playlist.id}
+                onClick={() => navigate(`/playlist/${playlist.id}`)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    navigate(`/playlist/${playlist.id}`);
+                  }
+                }}
+              >
+                <div className="relative flex h-[200px] w-[150px] items-center justify-center rounded bg-gradient-to-br from-[#380036] to-[#0CBABA] text-lg text-slate-200">
+                  {playlist.name}
+                  <button
+                    className="absolute right-1.5 top-1.5"
+                    onClick={(e) => handleDeletePlaylist(e, playlist.id)}
+                  >
+                    <FaRegTrashAlt className="size-4 text-red-500" />
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </Container>
+      <PlaylistCreate
+        visible={showPlaylistCreate}
+        onClose={() => setShowPlaylistCreate(false)}
+      />
     </div>
   );
 };

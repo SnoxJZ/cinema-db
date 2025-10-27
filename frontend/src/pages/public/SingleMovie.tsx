@@ -1,9 +1,12 @@
 import { useEffect, useState, type ReactNode } from 'react';
+import { FaPlus } from 'react-icons/fa6';
 import { FiChevronsUp } from 'react-icons/fi';
 import { MdFavoriteBorder, MdFavorite } from 'react-icons/md';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import { getSingleMovie } from '@/api/movie';
+import PlaylistAddMovie from '@/components/models/PlaylistAddMovie';
+import PlaylistCreate from '@/components/models/PlaylistCreate';
 import { useAuth, useNotification } from '@/hooks';
 import type { Actor, Movie } from '@/types';
 import { getEmbedUrl } from '@/utils/helper';
@@ -20,7 +23,8 @@ const convertDate = (date = '') => {
 
 export default function SingleMovie() {
   const [showScrollButton, setShowScrollButton] = useState(false);
-
+  const [showPlaylistCreate, setShowPlaylistCreate] = useState(false);
+  const [showPlaylistAddMovie, setShowPlaylistAddMovie] = useState(false);
   useEffect(() => {
     const handleScroll = () => {
       if (window.pageYOffset > 200) {
@@ -108,6 +112,12 @@ export default function SingleMovie() {
     await handleToggleFavorite(movieId || '');
     setMovie({ ...movie, isFavorite: !movie.isFavorite });
   };
+
+  const handleCreatePlaylist = () => {
+    setShowPlaylistAddMovie(false);
+    setShowPlaylistCreate(true);
+  };
+
   const {
     trailer,
     poster,
@@ -160,13 +170,21 @@ export default function SingleMovie() {
                 {title}
               </h1>
               {authInfo.isLoggedIn && (
-                <button onClick={handleFavorite}>
-                  {movie.isFavorite ? (
-                    <MdFavorite className="size-6 text-red-500" />
-                  ) : (
-                    <MdFavoriteBorder className="size-6 text-red-500" />
-                  )}
-                </button>
+                <div className="flex items-center gap-4">
+                  <button
+                    onClick={() => setShowPlaylistAddMovie(true)}
+                    className="flex items-center gap-2 rounded-md border border-light-subtle px-2 py-1 text-sm dark:border-dark-subtle dark:text-white"
+                  >
+                    <FaPlus className="size-3" /> Add to Playlist
+                  </button>
+                  <button onClick={handleFavorite}>
+                    {movie.isFavorite ? (
+                      <MdFavorite className="size-6 text-red-500" />
+                    ) : (
+                      <MdFavoriteBorder className="size-6 text-red-500" />
+                    )}
+                  </button>
+                </div>
               )}
             </div>
             <RatingStar rating={reviews?.ratingAvg} />
@@ -291,6 +309,16 @@ export default function SingleMovie() {
           </div>
         </div>
       </Container>
+      <PlaylistCreate
+        visible={showPlaylistCreate}
+        onClose={() => setShowPlaylistCreate(false)}
+      />
+      <PlaylistAddMovie
+        visible={showPlaylistAddMovie}
+        onClose={() => setShowPlaylistAddMovie(false)}
+        movieId={movieId || ''}
+        onCreatePlaylist={handleCreatePlaylist}
+      />
     </div>
   );
 }

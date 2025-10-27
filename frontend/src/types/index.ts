@@ -10,11 +10,6 @@ export interface User {
     public_id: string;
   };
   favorites?: string[];
-  playlists?: {
-    id: string;
-    name: string;
-    movies: string[];
-  }[];
 }
 
 export type MovieType = 'Movie' | 'Web Series' | 'TV Series' | 'Documentary';
@@ -159,4 +154,12 @@ export interface ActorSearchResponse {
 export interface ApiResponse<T> {
   data?: T;
   error?: string;
+}
+
+export interface PlaylistI {
+  id: string;
+  name: string;
+  description?: string;
+  isPublic: boolean;
+  movies: MovieListItem[];
 }
