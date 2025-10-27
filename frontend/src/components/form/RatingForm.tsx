@@ -80,7 +80,7 @@ export default function RatingForm({
           value={content}
           onChange={handleOnChange}
           placeholder="Write your review here..."
-          className="h-24 w-full resize-none rounded border-2 bg-transparent p-2 text-primary outline-none dark:text-white"
+          className="max-h-48 min-h-24 w-full rounded border border-gray-300 bg-white px-4 py-1 dark:border-gray-600 dark:bg-secondary dark:text-white"
         />
 
         <div className="flex justify-end">

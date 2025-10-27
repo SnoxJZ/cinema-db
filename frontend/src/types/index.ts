@@ -100,10 +100,28 @@ export interface Review {
   owner: {
     id: string;
     name: string;
+    avatar?: {
+      url: string;
+      public_id: string;
+    };
   };
   content: string;
   rating: number;
   isSpoiler: boolean;
+  replies?: Reply[];
+}
+
+export interface Reply {
+  id: string;
+  owner: {
+    id: string;
+    name: string;
+    avatar?: {
+      url: string;
+      public_id: string;
+    };
+  };
+  content: string;
 }
 
 export interface ReviewData {

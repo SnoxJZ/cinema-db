@@ -1,4 +1,10 @@
-import type { ReviewData, ReviewResponse, ApiResponse, Review } from '@/types';
+import type {
+  ReviewData,
+  ReviewResponse,
+  ApiResponse,
+  Review,
+  Reply,
+} from '@/types';
 
 import { catchError, getToken } from '../utils/helper';
 
@@ -73,6 +79,80 @@ export const updateReview = async (
   const token = getToken();
   try {
     const { data } = await client.patch(`/review/${reviewId}`, reviewData, {
+      headers: {
+        authorization: 'Bearer ' + token,
+      },
+    });
+    return { data, error: undefined };
+  } catch (error) {
+    return {
+      data: undefined,
+      error: catchError(error).error || 'An error occurred',
+    };
+  }
+};
+
+export const addReply = async (
+  reviewId: string,
+  content: string,
+): Promise<ApiResponse<{ message: string; reply: Reply }>> => {
+  const token = getToken();
+  try {
+    const { data } = await client.post(
+      `/review/add-reply/${reviewId}`,
+      { content },
+      {
+        headers: {
+          authorization: 'Bearer ' + token,
+        },
+      },
+    );
+    return { data, error: undefined };
+  } catch (error) {
+    return {
+      data: undefined,
+      error: catchError(error).error || 'An error occurred',
+    };
+  }
+};
+
+export const deleteReply = async (
+  reviewId: string,
+  replyId: string,
+): Promise<ApiResponse<{ message: string }>> => {
+  const token = getToken();
+  try {
+    const { data } = await client.delete(
+      `/review/delete-reply/${reviewId}/${replyId}`,
+      {
+        headers: {
+          authorization: 'Bearer ' + token,
+        },
+      },
+    );
+    return { data, error: undefined };
+  } catch (error) {
+    return {
+      data: undefined,
+      error: catchError(error).error || 'An error occurred',
+    };
+  }
+};
+
+export const getReviewsByUser = async (): Promise<
+  ApiResponse<{
+    reviews: {
+      id: string;
+      movieId: string;
+      movieTitle: string;
+      rating: number;
+      content: string;
+    }[];
+  }>
+> => {
+  const token = getToken();
+  try {
+    const { data } = await client.get(`/review/get-reviews-by-user`, {
       headers: {
         authorization: 'Bearer ' + token,
       },

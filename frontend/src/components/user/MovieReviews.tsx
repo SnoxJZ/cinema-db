@@ -2,12 +2,19 @@ import { useEffect, useState } from 'react';
 import { BsTrash, BsPencilSquare } from 'react-icons/bs';
 import { useParams } from 'react-router-dom';
 
-import type { Review, ReviewData } from '@/types';
+import type { Reply, Review, ReviewData, User } from '@/types';
 
-import { addReview, deleteReview, getReviewByMovie } from '../../api/review';
+import {
+  addReview,
+  addReply,
+  deleteReview,
+  getReviewByMovie,
+  deleteReply,
+} from '../../api/review';
 import { useAuth, useNotification } from '../../hooks';
 import Container from '../Container';
 import RatingForm from '../form/RatingForm';
+import Submit from '../form/Submit';
 import ConfirmModal from '../models/ConfirmModal';
 import EditRatingModal from '../models/EditRatingModal';
 import NotFoundText from '../NotFoundText';
@@ -39,7 +46,7 @@ export default function MovieReviews({
 
   const { movieId } = useParams();
   const { authInfo } = useAuth();
-  const { isLoggedIn } = authInfo;
+  const { isLoggedIn, profile } = authInfo;
   const profileId = authInfo.profile?.id;
 
   const { updateNotification } = useNotification();
@@ -107,6 +114,36 @@ export default function MovieReviews({
     setProfileOwnersReview(updatedReview);
   };
 
+  const handleAddReply = async (reviewId: string, content: string) => {
+    const { error, data: reply } = await addReply(reviewId, content);
+    if (error || !reply)
+      return updateNotification('error', error || 'An error occurred');
+    updateNotification('success', reply.message);
+
+    setReviews((prev) =>
+      prev?.map((r) =>
+        r.id === reviewId
+          ? { ...r, replies: [...(r.replies || []), reply.reply] }
+          : r,
+      ),
+    );
+  };
+
+  const handleDeleteReply = async (reviewId: string, replyId: string) => {
+    const { error, data } = await deleteReply(reviewId, replyId);
+    if (error || !data)
+      return updateNotification('error', error || 'An error occurred');
+    updateNotification('success', data.message);
+
+    setReviews((prev) =>
+      prev?.map((r) =>
+        r.id === reviewId
+          ? { ...r, replies: r.replies?.filter((r) => r.id !== replyId) }
+          : r,
+      ),
+    );
+  };
+
   const displayConfirmModal = () => setShowConfirmModal(true);
   const hideConfirmModal = () => setShowConfirmModal(false);
   const hideEditModal = () => {
@@ -130,7 +167,11 @@ export default function MovieReviews({
         <div className="mt-3 space-y-3">
           {profileOwnersReview && (
             <div>
-              <ReviewCard review={profileOwnersReview} />
+              <ReviewCard
+                profile={profile}
+                review={profileOwnersReview}
+                isLoggedIn={isLoggedIn}
+              />
               <div className="flex space-x-3 p-3 text-xl text-primary dark:text-white">
                 <button onClick={displayConfirmModal} type="button">
                   <BsTrash />
@@ -142,7 +183,14 @@ export default function MovieReviews({
             </div>
           )}
           {reviews?.map((review) => (
-            <ReviewCard review={review} key={review.id} />
+            <ReviewCard
+              profile={profile}
+              review={review}
+              key={review.id}
+              isLoggedIn={isLoggedIn}
+              onAddReply={handleAddReply}
+              onDeleteReply={handleDeleteReply}
+            />
           ))}
         </div>
       </Container>
@@ -166,20 +214,104 @@ export default function MovieReviews({
   );
 }
 
-const ReviewCard = ({ review }: { review: Review }) => {
-  const { owner, content, rating } = review;
+const ReviewCard = ({
+  review,
+  onAddReply,
+  onDeleteReply,
+  isLoggedIn,
+  profile,
+}: {
+  review: Review;
+  onAddReply?: (reviewId: string, content: string) => void;
+  onDeleteReply?: (reviewId: string, replyId: string) => void;
+  isLoggedIn: boolean;
+  profile: User | null;
+}) => {
+  const [isAddReply, setIsAddReply] = useState<boolean>(false);
+  const [replyContent, setReplyContent] = useState<string>('');
+  const { owner, content, rating, id, replies } = review;
 
   return (
     <div className="flex space-x-3">
-      <div className="flex size-12 shrink-0 select-none items-center justify-center rounded-full bg-light-subtle text-xl text-white dark:bg-dark-subtle">
-        {getNameInitial(owner.name)}
-      </div>
+      {owner.avatar ? (
+        <img
+          src={owner.avatar.url}
+          alt={owner.name}
+          className="size-12 shrink-0 rounded-full"
+        />
+      ) : (
+        <div className="flex size-12 shrink-0 select-none items-center justify-center rounded-full bg-light-subtle text-xl text-white dark:bg-dark-subtle">
+          {getNameInitial(owner.name)}
+        </div>
+      )}
       <div>
-        <h1 className="text-lg font-semibold text-secondary dark:text-white">
+        <h3 className="text-lg font-semibold text-secondary dark:text-white">
           {owner.name}
-        </h1>
+        </h3>
         <RatingStar rating={rating} />
         <p className="text-light-subtle dark:text-dark-subtle">{content}</p>
+        {isLoggedIn && onAddReply && (
+          <button
+            className="border-b text-sm text-primary dark:text-white"
+            type="button"
+            onClick={() => setIsAddReply(true)}
+          >
+            Reply
+          </button>
+        )}
+        {isAddReply && (
+          <div className="mt-3">
+            <textarea
+              className="w-full rounded border border-gray-300 bg-white px-4 py-1 dark:border-gray-600 dark:bg-secondary dark:text-white"
+              value={replyContent}
+              onChange={(e) => setReplyContent(e.target.value)}
+            />
+            <Submit
+              onClick={() => {
+                onAddReply?.(id, replyContent);
+                setIsAddReply(false);
+              }}
+              value="Add Reply"
+              className="h-9 !w-24 !px-2 !text-base"
+            />
+          </div>
+        )}
+
+        <div className="mt-3 space-y-3">
+          {replies?.map((reply) => (
+            <div key={reply.id} className="flex items-center gap-3">
+              {reply.owner.avatar ? (
+                <img
+                  src={reply.owner.avatar.url}
+                  alt={reply.owner.name}
+                  className="size-12 shrink-0 rounded-full"
+                />
+              ) : (
+                <div className="flex size-12 shrink-0 select-none items-center justify-center rounded-full bg-light-subtle text-xl text-white dark:bg-dark-subtle">
+                  {getNameInitial(reply.owner.name)}
+                </div>
+              )}
+              <div className="flex flex-col gap-1">
+                <div className="flex items-center gap-2">
+                  <p className="font-semibold text-secondary dark:text-white">
+                    {reply.owner.name}
+                  </p>
+                  {profile?.id === reply.owner.id && (
+                    <button
+                      type="button"
+                      onClick={() => onDeleteReply?.(id, reply.id)}
+                    >
+                      <BsTrash className="text-red-500" />
+                    </button>
+                  )}
+                </div>
+                <p className="text-sm text-light-subtle dark:text-dark-subtle">
+                  {reply.content}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

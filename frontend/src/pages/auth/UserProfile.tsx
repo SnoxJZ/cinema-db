@@ -2,10 +2,12 @@ import { useEffect, useRef, useState } from 'react';
 import { FaPlus, FaRegTrashAlt } from 'react-icons/fa';
 import { Link, useNavigate } from 'react-router-dom';
 
+import { getReviewsByUser } from '@/api/review';
 import Container from '@/components/Container';
 import Loading from '@/components/Loading';
 import PlaylistCreate from '@/components/models/PlaylistCreate';
-import { useAuth, usePlaylist } from '@/hooks';
+import RatingStar from '@/components/RatingStar';
+import { useAuth, useNotification, usePlaylist } from '@/hooks';
 import { useUpdateUser } from '@/hooks/useUpdateUser';
 
 const UserProfile = () => {
@@ -13,10 +15,27 @@ const UserProfile = () => {
   const { profile } = authInfo;
   const navigate = useNavigate();
   const [showPlaylistCreate, setShowPlaylistCreate] = useState(false);
+  const [reviews, setReviews] = useState<
+    {
+      id: string;
+      movieId: string;
+      movieTitle: string;
+      rating: number;
+      content: string;
+    }[]
+  >([]);
+  const { updateNotification } = useNotification();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { playlists, fetchPlaylists, isLoading, deletePlaylist } =
     usePlaylist();
+
+  const fetchReviews = async () => {
+    const { data, error } = await getReviewsByUser();
+    if (error || !data)
+      return updateNotification('error', error || 'An error occurred');
+    setReviews(data.reviews);
+  };
 
   const {
     selectedImage,
@@ -39,6 +58,7 @@ const UserProfile = () => {
 
   useEffect(() => {
     fetchPlaylists();
+    fetchReviews();
   }, []);
 
   const handleDeletePlaylist = async (
@@ -247,6 +267,30 @@ const UserProfile = () => {
                     <FaRegTrashAlt className="size-4 text-red-500" />
                   </button>
                 </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="flex w-full flex-col gap-3">
+          <h2 className="text-xl font-semibold text-highlight dark:text-highlight-dark">
+            Your Reviews
+          </h2>
+          <div className="flex flex-col gap-6">
+            {reviews.map((review) => (
+              <div key={review.id}>
+                <div className="flex items-center gap-2">
+                  <Link
+                    to={`/movie/${review.movieId}`}
+                    className="text-lg font-semibold text-secondary dark:text-white"
+                  >
+                    {review.movieTitle}
+                  </Link>
+                  <RatingStar rating={review.rating} />
+                </div>
+                <p className="text-sm text-light-subtle dark:text-dark-subtle">
+                  {review.content}
+                </p>
               </div>
             ))}
           </div>
