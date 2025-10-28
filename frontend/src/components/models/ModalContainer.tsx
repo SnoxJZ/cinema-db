@@ -41,7 +41,7 @@ export default function ModalContainer({
       id="modal-container"
       role="button"
       tabIndex={0}
-      className="fixed inset-0 flex items-center justify-center bg-primary/50 backdrop-blur-sm dark:bg-white/50"
+      className="fixed inset-0 flex cursor-default items-center justify-center bg-primary/50 backdrop-blur-sm dark:bg-white/50"
     >
       {renderChildren()}
     </div>

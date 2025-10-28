@@ -1,3 +1,5 @@
+import clsx from 'clsx';
+
 export default function NextAndPrevButton({
   className = '',
   onNextClick,
@@ -7,12 +9,8 @@ export default function NextAndPrevButton({
   onNextClick: () => void;
   onPrevClick: () => void;
 }) {
-  const getClasses = () => {
-    return 'flex justify-end items-center space-x-3 ';
-  };
-
   return (
-    <div className={getClasses() + className}>
+    <div className={clsx('flex items-center justify-end space-x-3', className)}>
       <Button onClick={onPrevClick} title="Previous" />
       <Button onClick={onNextClick} title="Next" />
     </div>

@@ -11,7 +11,7 @@ import ModalContainer from './ModalContainer';
 interface EditRatingModalProps {
   visible: boolean;
   initialState: Omit<Review, 'owner'> | null;
-  onSuccess: (data: ReviewData) => void;
+  onSuccess: (data: Omit<Review, 'owner'>) => void;
   onClose: () => void;
 }
 
@@ -35,7 +35,7 @@ export default function EditRatingModal({
     if (error || !responseData)
       return updateNotification('error', error || 'An error occurred');
 
-    onSuccess({ ...data });
+    onSuccess({ ...data, id: initialState.id });
     updateNotification('success', responseData.message);
     onClose();
   };

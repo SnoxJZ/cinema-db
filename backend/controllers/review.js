@@ -64,8 +64,16 @@ exports.updateReview = async (req, res) => {
 
   if (!isValidObjectId(reviewId)) return sendError(res, "Invalid review ID");
 
-  const review = await Review.findOne({ owner: userId, _id: reviewId });
+  const review = await Review.findById(reviewId);
   if (!review) return sendError(res, "Review not found!", 404);
+
+  if (
+    review.owner.toString() !== userId.toString() &&
+    req.user.role !== "admin" &&
+    req.user.role !== "moderator"
+  ) {
+    return sendError(res, "Unauthorized!", 401);
+  }
 
   review.content = content;
   review.rating = rating;
@@ -88,8 +96,16 @@ exports.removeReview = async (req, res) => {
 
   if (!isValidObjectId(reviewId)) return sendError(res, "Invalid review ID");
 
-  const review = await Review.findOne({ owner: userId, _id: reviewId });
+  const review = await Review.findById(reviewId);
   if (!review) return sendError(res, "Invalid request, review not found!");
+
+  if (
+    review.owner.toString() !== userId.toString() &&
+    req.user.role !== "admin" &&
+    req.user.role !== "moderator"
+  ) {
+    return sendError(res, "Not authorized to delete this review");
+  }
 
   const movie = await Movie.findById(review.parentMovie).select(
     "reviews reviewStats"
@@ -224,8 +240,13 @@ exports.removeReply = async (req, res) => {
   const reply = review.replies.id(replyId);
   if (!reply) return sendError(res, "Reply not found!", 404);
 
-  if (reply.owner.toString() !== userId.toString())
+  if (
+    reply.owner.toString() !== userId.toString() &&
+    req.user.role !== "admin" &&
+    req.user.role !== "moderator"
+  ) {
     return sendError(res, "Unauthorized!", 401);
+  }
 
   review.replies.pull(replyId);
   await review.save();

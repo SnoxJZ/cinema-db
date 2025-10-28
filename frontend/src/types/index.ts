@@ -3,14 +3,26 @@ export interface User {
   token: string;
   name: string;
   email: string;
-  role: 'admin' | 'user';
+  role: 'admin' | 'user' | 'moderator';
   isVerified: boolean;
   avatar?: {
     url: string;
     public_id: string;
   };
   favorites?: string[];
+  isBlocked: boolean;
+  blockedUntil: Date | undefined;
 }
+
+export type BlockDuration =
+  | '1d'
+  | '1w'
+  | '1m'
+  | '3m'
+  | '6m'
+  | '1y'
+  | 'permanent'
+  | undefined;
 
 export type MovieType = 'Movie' | 'Web Series' | 'TV Series' | 'Documentary';
 
@@ -56,7 +68,7 @@ export interface Movie {
 
 export type MovieFormT = Omit<
   Movie,
-  'id' | 'poster' | 'cast' | 'writers' | 'director'
+  'id' | 'poster' | 'cast' | 'writers' | 'director' | 'producers'
 > & {
   poster?: File | null;
   cast?: Array<{

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { BsPencilSquare, BsTrash } from 'react-icons/bs';
 
 import { deleteActor, getActors, searchActor } from '@/api/actor';
-import { useNotification, useSearch } from '@/hooks';
+import { useAuth, useNotification, useSearch } from '@/hooks';
 import type { Actor } from '@/types';
 
 import AppSearchForm from '../../components/form/AppSearchForm';
@@ -116,7 +116,7 @@ export default function Actors() {
   }, []);
 
   return (
-    <>
+    <div className="bg-white p-5 dark:bg-primary">
       <div className="p-5">
         <div className="mb-5 flex justify-end">
           <AppSearchForm
@@ -128,7 +128,7 @@ export default function Actors() {
         </div>
         <NotFoundText visible={resultNotFound} text="Not found" />
 
-        <div className="grid grid-cols-4 gap-5">
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {results?.length || resultNotFound
             ? results?.map((actor) => (
                 <ActorProfile
@@ -172,7 +172,7 @@ export default function Actors() {
         initialState={selectedProfile}
         onSuccess={handleOnActorUpdate}
       />
-    </>
+    </div>
   );
 }
 
@@ -213,11 +213,19 @@ const ActorProfile = ({
         onMouseLeave={handleOnMouseLeave}
         className="relative flex cursor-pointer"
       >
-        <img
-          src={avatar?.url}
-          alt={name}
-          className="aspect-square w-20 object-cover"
-        />
+        {avatar?.url ? (
+          <div className="flex size-20 shrink-0 items-center justify-center">
+            <img
+              src={avatar?.url}
+              alt={name}
+              className="size-full object-cover"
+            />
+          </div>
+        ) : (
+          <div className="flex aspect-square h-full w-20 shrink-0 items-center justify-center bg-gray-200 text-2xl font-bold">
+            {name[0]}
+          </div>
+        )}
 
         <div className="px-2">
           <h1 className="whitespace-nowrap text-xl font-semibold text-primary dark:text-white">
@@ -246,23 +254,26 @@ const Options = ({
   onDeleteClick: () => void;
   onEditClick: () => void;
 }) => {
+  const { isAdmin } = useAuth();
   if (!visible) return null;
 
   return (
     <div className="absolute inset-0 flex items-center justify-center space-x-5 bg-primary/25 backdrop-blur-sm">
-      <button
-        onClick={onDeleteClick}
-        className="rounded-full bg-white p-2 text-primary transition hover:opacity-80"
-        type="button"
-      >
-        <BsTrash />
-      </button>
+      {isAdmin && (
+        <button
+          onClick={onDeleteClick}
+          className="rounded-full bg-white p-2 text-primary transition hover:opacity-80"
+          type="button"
+        >
+          <BsTrash className="text-red-500" />
+        </button>
+      )}
       <button
         onClick={onEditClick}
         className="rounded-full bg-white p-2 text-primary transition hover:opacity-80"
         type="button"
       >
-        <BsPencilSquare />
+        <BsPencilSquare className="text-orange-400" />
       </button>
     </div>
   );

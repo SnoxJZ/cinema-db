@@ -11,6 +11,9 @@ const {
   updateProfile,
   toggleFavorite,
   getFavorites,
+  getUsers,
+  blockUser,
+  unblockUser,
 } = require("../controllers/user");
 const { uploadImage } = require("../middlewares/multer");
 const { isAuth } = require("../middlewares/auth");
@@ -21,9 +24,13 @@ const {
   validatePassword,
   signInValidator,
 } = require("../middlewares/validator");
+const { isAdminOrModerator } = require("../middlewares/auth");
 
 const router = express.Router();
 
+router.get("/users", isAuth, isAdminOrModerator, getUsers);
+router.patch("/block/:userId", isAuth, isAdminOrModerator, blockUser);
+router.patch("/unblock/:userId", isAuth, isAdminOrModerator, unblockUser);
 router.post("/create", userValidtor, validate, create);
 router.post("/sign-in", signInValidator, validate, signIn);
 router.post("/verify-email", verifyEmail);

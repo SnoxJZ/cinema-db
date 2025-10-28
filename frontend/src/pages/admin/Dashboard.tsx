@@ -30,7 +30,7 @@ export default function Dashboard() {
   }, []);
 
   return (
-    <div className="grid grid-cols-3 gap-5 p-5">
+    <div className="grid grid-cols-1 gap-5 bg-white p-5 dark:bg-primary md:grid-cols-3">
       <AppInfoBox
         title="Total Movies/Series"
         subTitle={appInfo.movieCount.toLocaleString()}

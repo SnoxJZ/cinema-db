@@ -360,3 +360,87 @@ exports.getFavorites = async (req, res) => {
 
   res.json({ movies: favorites });
 };
+
+exports.getUsers = async (req, res) => {
+  const { page = 1, limit = 20, search = "" } = req.query;
+
+  const query = search
+    ? {
+        $or: [
+          { name: { $regex: search, $options: "i" } },
+          { email: { $regex: search, $options: "i" } },
+        ],
+      }
+    : {};
+
+  const pageNum = parseInt(page);
+  const limitNum = parseInt(limit);
+
+  const users = await User.find(query)
+    .select("-password -__v")
+    .limit(limitNum)
+    .skip((pageNum - 1) * limitNum)
+    .sort({ createdAt: -1, _id: 1 });
+
+  const formattedUsers = users.map((user) => ({
+    ...user.toObject(),
+    id: user._id,
+    _id: undefined,
+  }));
+
+  const count = await User.countDocuments(query);
+
+  res.json({
+    users: formattedUsers,
+    totalPages: Math.ceil(count / limitNum),
+    currentPage: pageNum,
+  });
+};
+
+exports.blockUser = async (req, res) => {
+  const { userId } = req.params;
+  const { duration } = req.body;
+
+  if (!isValidObjectId(userId)) return sendError(res, "Invalid user ID");
+
+  const durations = {
+    "1d": 1,
+    "1w": 7,
+    "1m": 30,
+    "3m": 90,
+    "6m": 180,
+    "1y": 365,
+    permanent: 100 * 365,
+  };
+
+  const days = durations[duration];
+  if (days === undefined) return sendError(res, "Invalid duration");
+
+  const blockedUntil = new Date(Date.now() + days * 24 * 60 * 60 * 1000);
+
+  const user = await User.findByIdAndUpdate(
+    userId,
+    { isBlocked: true, blockedUntil },
+    { new: true }
+  ).select("-password");
+
+  if (!user) return sendError(res, "User not found");
+
+  res.json({ message: "User blocked successfully", user });
+};
+
+exports.unblockUser = async (req, res) => {
+  const { userId } = req.params;
+
+  if (!isValidObjectId(userId)) return sendError(res, "Invalid user ID");
+
+  const user = await User.findByIdAndUpdate(
+    userId,
+    { isBlocked: false, blockedUntil: null },
+    { new: true }
+  ).select("-password");
+
+  if (!user) return sendError(res, "User not found");
+
+  res.json({ message: "User unblocked successfully", user });
+};

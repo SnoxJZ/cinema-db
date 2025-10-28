@@ -39,6 +39,14 @@ const userSchema = mongoose.Schema({
       ref: "Movie",
     },
   ],
+  isBlocked: {
+    type: Boolean,
+    default: false,
+  },
+  blockedUntil: {
+    type: Date,
+    default: undefined,
+  },
 });
 
 userSchema.pre("save", async function (next) {

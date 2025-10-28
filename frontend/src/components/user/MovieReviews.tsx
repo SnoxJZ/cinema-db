@@ -45,7 +45,7 @@ export default function MovieReviews({
   const [busy, setBusy] = useState(false);
 
   const { movieId } = useParams();
-  const { authInfo } = useAuth();
+  const { authInfo, isPrivilegedUser } = useAuth();
   const { isLoggedIn, profile } = authInfo;
   const profileId = authInfo.profile?.id;
 
@@ -65,19 +65,6 @@ export default function MovieReviews({
     );
   };
 
-  const handleOnEditClick = () => {
-    if (!profileOwnersReview) return;
-    const { id, content, rating, isSpoiler } = profileOwnersReview;
-    setSelectedReview({
-      id,
-      content,
-      rating,
-      isSpoiler,
-    });
-
-    setShowEditModal(true);
-  };
-
   const handleAddReview = async (data: ReviewData) => {
     const { error, data: reviews } = await addReview(movieId || '', data);
     if (error || !reviews)
@@ -88,30 +75,36 @@ export default function MovieReviews({
     setProfileOwnersReview(reviews.newReview);
   };
 
-  const handleDeleteConfirm = async () => {
-    if (!profileOwnersReview) return;
+  const handleDeleteConfirm = async (id: string) => {
+    if (!id) return;
     setBusy(true);
-    const { error, data } = await deleteReview(profileOwnersReview.id);
+    const { error, data } = await deleteReview(id);
     setBusy(false);
     if (error || !data)
       return updateNotification('error', error || 'An error occurred');
 
     updateNotification('success', data.message);
 
-    setProfileOwnersReview(null);
+    setProfileOwnersReview((prev) => (prev?.id === id ? null : prev));
+    setReviews((prev) => prev?.filter((r) => r.id !== id) || []);
     hideConfirmModal();
   };
 
-  const handleOnReviewUpdate = (review: ReviewData) => {
-    if (!profileOwnersReview) return;
+  const handleOnReviewUpdate = (review: Omit<Review, 'owner'>) => {
+    if (!review.id) return;
     const updatedReview = {
-      ...profileOwnersReview,
+      ...review,
       rating: review.rating,
       content: review.content,
       isSpoiler: review.isSpoiler,
     };
 
-    setProfileOwnersReview(updatedReview);
+    setProfileOwnersReview((prev) =>
+      prev?.id === review.id ? { ...prev, ...updatedReview } : prev,
+    );
+    setReviews((prev) =>
+      prev?.map((r) => (r.id === review.id ? { ...r, ...updatedReview } : r)),
+    );
   };
 
   const handleAddReply = async (reviewId: string, content: string) => {
@@ -144,7 +137,32 @@ export default function MovieReviews({
     );
   };
 
-  const displayConfirmModal = () => setShowConfirmModal(true);
+  const displayConfirmModal = (data: Review) => {
+    if (!data) return;
+    const { id, content, rating, isSpoiler } = data;
+    setSelectedReview({
+      id,
+      content,
+      rating,
+      isSpoiler,
+    });
+
+    setShowConfirmModal(true);
+  };
+
+  const displayEditModal = (data: Review) => {
+    if (!data) return;
+    const { id, content, rating, isSpoiler } = data;
+    setSelectedReview({
+      id,
+      content,
+      rating,
+      isSpoiler,
+    });
+
+    setShowEditModal(true);
+  };
+
   const hideConfirmModal = () => setShowConfirmModal(false);
   const hideEditModal = () => {
     setShowEditModal(false);
@@ -166,28 +184,24 @@ export default function MovieReviews({
         {isLoggedIn && <RatingForm onSubmit={handleAddReview} />}
         <div className="mt-3 space-y-3">
           {profileOwnersReview && (
-            <div>
-              <ReviewCard
-                profile={profile}
-                review={profileOwnersReview}
-                isLoggedIn={isLoggedIn}
-              />
-              <div className="flex space-x-3 p-3 text-xl text-primary dark:text-white">
-                <button onClick={displayConfirmModal} type="button">
-                  <BsTrash />
-                </button>
-                <button onClick={handleOnEditClick} type="button">
-                  <BsPencilSquare />
-                </button>
-              </div>
-            </div>
+            <ReviewCard
+              profile={profile}
+              review={profileOwnersReview}
+              isLoggedIn={isLoggedIn}
+              isPrivilegedUser={isPrivilegedUser}
+              onDeleteReview={displayConfirmModal}
+              onEditReview={displayEditModal}
+            />
           )}
           {reviews?.map((review) => (
             <ReviewCard
+              key={review.id}
               profile={profile}
               review={review}
-              key={review.id}
               isLoggedIn={isLoggedIn}
+              isPrivilegedUser={isPrivilegedUser}
+              onDeleteReview={displayConfirmModal}
+              onEditReview={displayEditModal}
               onAddReply={handleAddReply}
               onDeleteReply={handleDeleteReply}
             />
@@ -198,10 +212,10 @@ export default function MovieReviews({
       <ConfirmModal
         visible={showConfirmModal}
         onCancel={hideConfirmModal}
-        onConfirm={handleDeleteConfirm}
+        onConfirm={() => handleDeleteConfirm(selectedReview?.id || '')}
         busy={busy}
         title="Are you sure?"
-        subtitle="Your review will be permanently deleted!"
+        subtitle="Review will be permanently deleted!"
       />
 
       <EditRatingModal
@@ -216,15 +230,21 @@ export default function MovieReviews({
 
 const ReviewCard = ({
   review,
+  onDeleteReview,
+  onEditReview,
   onAddReply,
   onDeleteReply,
   isLoggedIn,
+  isPrivilegedUser,
   profile,
 }: {
   review: Review;
+  onDeleteReview: (review: Review) => void;
+  onEditReview: (review: Review) => void;
   onAddReply?: (reviewId: string, content: string) => void;
   onDeleteReply?: (reviewId: string, replyId: string) => void;
   isLoggedIn: boolean;
+  isPrivilegedUser: boolean;
   profile: User | null;
 }) => {
   const [isAddReply, setIsAddReply] = useState<boolean>(false);
@@ -245,11 +265,24 @@ const ReviewCard = ({
         </div>
       )}
       <div>
-        <h3 className="text-lg font-semibold text-secondary dark:text-white">
-          {owner.name}
-        </h3>
+        <div className="flex items-center gap-2">
+          <h3 className="text-lg font-semibold text-secondary dark:text-white">
+            {owner.name}
+          </h3>
+          {(isPrivilegedUser || profile?.id === owner.id) && (
+            <>
+              <button type="button" onClick={() => onDeleteReview(review)}>
+                <BsTrash className="text-red-500" />
+              </button>
+              <button onClick={() => onEditReview(review)} type="button">
+                <BsPencilSquare className="size-4 text-orange-400" />
+              </button>
+            </>
+          )}
+        </div>
         <RatingStar rating={rating} />
         <p className="text-light-subtle dark:text-dark-subtle">{content}</p>
+
         {isLoggedIn && onAddReply && (
           <button
             className="border-b text-sm text-primary dark:text-white"
@@ -296,7 +329,7 @@ const ReviewCard = ({
                   <p className="font-semibold text-secondary dark:text-white">
                     {reply.owner.name}
                   </p>
-                  {profile?.id === reply.owner.id && (
+                  {(isPrivilegedUser || profile?.id === reply.owner.id) && (
                     <button
                       type="button"
                       onClick={() => onDeleteReply?.(id, reply.id)}

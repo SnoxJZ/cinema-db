@@ -17,7 +17,11 @@ export const catchError = (error: any) => {
 export const renderItem = (result: { avatar: string; name: string }) => {
   return (
     <div className="flex overflow-hidden rounded">
-      <img src={result.avatar} alt="" className="size-16 object-cover" />
+      <img
+        src={result.avatar || undefined}
+        alt={result.name}
+        className="size-16 object-cover"
+      />
       <p className="font-semibold dark:text-white">{result.name}</p>
     </div>
   );
@@ -39,6 +43,7 @@ export const convertReviewCount = (count = 0) => {
 
 export const getEmbedUrl = (url: string | undefined | null) => {
   if (!url) return '';
+  if (url.includes('cloudinary')) return url;
   const videoId = url.split('v=')[1];
   return `https://www.youtube.com/embed/${videoId}`;
 };

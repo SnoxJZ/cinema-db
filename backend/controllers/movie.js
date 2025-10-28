@@ -49,9 +49,9 @@ exports.createMovie = async (req, res) => {
     releseDate,
     status,
     type,
-    genres,
-    tags,
-    cast,
+    genres: typeof genres === "string" ? JSON.parse(genres) : genres,
+    tags: typeof tags === "string" ? JSON.parse(tags) : tags,
+    cast: typeof cast === "string" ? JSON.parse(cast) : cast,
     trailer,
     language,
   });
@@ -63,12 +63,13 @@ exports.createMovie = async (req, res) => {
   }
 
   if (writers) {
-    for (let writerId of writers) {
+    const parsedWriters =
+      typeof writers === "string" ? JSON.parse(writers) : writers;
+    for (let writerId of parsedWriters) {
       if (!isValidObjectId(writerId))
         return sendError(res, "Invalid writer ID!");
     }
-
-    newMovie.writers = writers;
+    newMovie.writers = parsedWriters;
   }
 
   // poster upload

@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Routes, Route } from 'react-router-dom';
 
 import AllMovies from '@/pages/public/AllMovies.tsx';
@@ -5,10 +6,17 @@ import Documentaries from '@/pages/public/Documentaries.tsx';
 import TVSeries from '@/pages/public/TVSeries.tsx';
 import WebSeries from '@/pages/public/WebSeries.tsx';
 
+import Header from './components/admin/Header';
+import MovieUpload from './components/admin/MovieUpload';
+import ActorUpload from './components/models/ActorUpload';
 import ScrollToTop from './components/ScrollToTop';
 import Navbar from './components/user/Navbar';
 import { useAuth } from './hooks';
-import AdminNavigator from './navigator/AdminNavigator';
+import Actors from './pages/admin/Actors';
+import Dashboard from './pages/admin/Dashboard';
+import Movies from './pages/admin/Movies';
+import AdminSearchMovies from './pages/admin/SearchMovies';
+import Users from './pages/admin/Users';
 import ConfirmPassword from './pages/auth/ConfirmPassword';
 import EmailVerification from './pages/auth/EmailVerification';
 import Favorites from './pages/auth/Favorites';
@@ -24,15 +32,36 @@ import SearchMovies from './pages/public/SearchMovies';
 import SingleMovie from './pages/public/SingleMovie';
 
 export default function App() {
-  const { authInfo } = useAuth();
-  const isAdmin = authInfo.profile?.role === 'admin';
+  const { isPrivilegedUser } = useAuth();
+  const [showMovieUploadModal, setShowMovieUploadModal] = useState(false);
+  const [showActorUploadModal, setShowActorUploadModal] = useState(false);
 
-  if (isAdmin) return <AdminNavigator />;
+  const displayMovieUploadModal = () => {
+    setShowMovieUploadModal(true);
+  };
+
+  const hideMovieUploadModal = () => {
+    setShowMovieUploadModal(false);
+  };
+
+  const displayActorUploadModal = () => {
+    setShowActorUploadModal(true);
+  };
+
+  const hideActorUploadModal = () => {
+    setShowActorUploadModal(false);
+  };
 
   return (
     <>
       <ScrollToTop />
       <Navbar />
+      {isPrivilegedUser && (
+        <Header
+          onAddMovieClick={displayMovieUploadModal}
+          onAddActorClick={displayActorUploadModal}
+        />
+      )}
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/auth/signin" element={<Signin />} />
@@ -50,8 +79,32 @@ export default function App() {
         <Route path="/user/:userId/favorites" element={<Favorites />} />
         <Route path="/playlist/:playlistId" element={<Playlist />} />
         <Route path="/movie/search" element={<SearchMovies />} />
+
+        {isPrivilegedUser && (
+          <>
+            <Route path="/admin" element={<Dashboard />} />
+            <Route path="/admin/movies" element={<Movies />} />
+            <Route path="/admin/actors" element={<Actors />} />
+            <Route path="/admin/users" element={<Users />} />
+            <Route path="/search" element={<AdminSearchMovies />} />
+          </>
+        )}
+
         <Route path="*" element={<NotFound />} />
       </Routes>
+
+      {isPrivilegedUser && (
+        <>
+          <MovieUpload
+            visible={showMovieUploadModal}
+            onClose={hideMovieUploadModal}
+          />
+          <ActorUpload
+            visible={showActorUploadModal}
+            onClose={hideActorUploadModal}
+          />
+        </>
+      )}
     </>
   );
 }

@@ -1,4 +1,10 @@
-import { createContext, useEffect, useState, type ReactNode } from 'react';
+import {
+  createContext,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import type { User } from '@/types';
@@ -37,6 +43,8 @@ interface AuthContext {
     newPassword?: string;
   }) => Promise<void>;
   handleToggleFavorite: (movieId: string) => Promise<void>;
+  isPrivilegedUser: boolean;
+  isAdmin: boolean;
 }
 
 export const AuthContext = createContext<AuthContext | null>(null);
@@ -153,6 +161,15 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     updateNotification('success', data.message);
   };
 
+  const isPrivilegedUser = useMemo(() => {
+    const role = authInfo.profile?.role;
+    return role === 'admin' || role === 'moderator';
+  }, [authInfo.profile?.role]);
+
+  const isAdmin = useMemo(() => {
+    return authInfo.profile?.role === 'admin';
+  }, [authInfo.profile?.role]);
+
   useEffect(() => {
     isAuth();
   }, []);
@@ -167,6 +184,8 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
         handleUpdateAvatar,
         handleUpdateProfile,
         handleToggleFavorite,
+        isPrivilegedUser,
+        isAdmin,
       }}
     >
       {children}

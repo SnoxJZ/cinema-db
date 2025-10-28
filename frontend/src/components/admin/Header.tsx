@@ -1,9 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
-import { AiOutlinePlus } from 'react-icons/ai';
-import { BsFillSunFill } from 'react-icons/bs';
-import { useNavigate } from 'react-router-dom';
-
-import { useTheme } from '@/hooks';
+import { AiOutlinePlus, AiOutlineHome } from 'react-icons/ai';
+import { BiMoviePlay } from 'react-icons/bi';
+import { FaUser, FaUserNinja } from 'react-icons/fa';
+import { NavLink, useNavigate } from 'react-router-dom';
 
 import AppSearchForm from '../form/AppSearchForm';
 
@@ -15,7 +14,6 @@ export default function Header({
   onAddMovieClick: () => void;
 }) {
   const [showOptions, setShowOptions] = useState(false);
-  const { toggleTheme } = useTheme();
 
   const navigate = useNavigate();
 
@@ -31,20 +29,38 @@ export default function Header({
   };
 
   return (
-    <div className="relative flex items-center justify-between p-5">
-      <AppSearchForm
-        onSubmit={handleSearchSubmit}
-        placeholder="Search Movie..."
-      />
-
+    <div className="relative flex flex-wrap items-center justify-between bg-white p-5 dark:bg-primary">
+      <ul className="flex flex-wrap items-center space-x-2 sm:space-x-4">
+        <li>
+          <NavItem to="/admin">
+            <AiOutlineHome />
+            <span>Dashboard</span>
+          </NavItem>
+        </li>
+        <li>
+          <NavItem to="/admin/movies">
+            <BiMoviePlay />
+            <span>Movies</span>
+          </NavItem>
+        </li>
+        <li>
+          <NavItem to="/admin/actors">
+            <FaUserNinja />
+            <span>Actors</span>
+          </NavItem>
+        </li>
+        <li>
+          <NavItem to="/admin/users">
+            <FaUser />
+            <span>Users</span>
+          </NavItem>
+        </li>
+      </ul>
       <div className="flex items-center space-x-3">
-        <button
-          onClick={toggleTheme}
-          className="text-light-subtle dark:text-white"
-        >
-          <BsFillSunFill size={24} />
-        </button>
-
+        <AppSearchForm
+          onSubmit={handleSearchSubmit}
+          placeholder="Search Movie..."
+        />
         <button
           onClick={() => setShowOptions(true)}
           className="flex items-center space-x-2 rounded border-2 border-light-subtle px-3 py-1 text-lg font-semibold text-light-subtle transition hover:opacity-80 dark:border-dark-subtle dark:text-dark-subtle"
@@ -52,7 +68,6 @@ export default function Header({
           <span>Create</span>
           <AiOutlinePlus />
         </button>
-
         <CreateOptions
           visible={showOptions}
           onClose={() => setShowOptions(false)}
@@ -139,5 +154,27 @@ const Option = ({
     >
       {children}
     </button>
+  );
+};
+
+const NavItem = ({
+  children,
+  to,
+}: {
+  children: React.ReactNode;
+  to: string;
+}) => {
+  const commonClasses =
+    ' flex items-center text-lg space-x-2 p-2 hover:opacity-80';
+  return (
+    <NavLink
+      className={({ isActive }) =>
+        (isActive ? 'text-primary dark:text-white' : 'text-gray-400') +
+        commonClasses
+      }
+      to={to}
+    >
+      {children}
+    </NavLink>
   );
 };

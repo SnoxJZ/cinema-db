@@ -8,7 +8,7 @@ const {
   getSingleActor,
   getActors,
 } = require("../controllers/actor");
-const { isAuth, isAdmin } = require("../middlewares/auth");
+const { isAuth, isAdminOrModerator, isAdmin } = require("../middlewares/auth");
 const { uploadImage } = require("../middlewares/multer");
 const { actorInfoValidator, validate } = require("../middlewares/validator");
 
@@ -17,7 +17,7 @@ const router = express.Router();
 router.post(
   "/create",
   isAuth,
-  isAdmin,
+  isAdminOrModerator,
   uploadImage.single("avatar"),
   actorInfoValidator,
   validate,
@@ -27,7 +27,7 @@ router.post(
 router.post(
   "/update/:actorId",
   isAuth,
-  isAdmin,
+  isAdminOrModerator,
   uploadImage.single("avatar"),
   actorInfoValidator,
   validate,
@@ -35,9 +35,9 @@ router.post(
 );
 
 router.delete("/:actorId", isAuth, isAdmin, removeActor);
-router.get("/search", isAuth, isAdmin, searchActor);
+router.get("/search", isAuth, isAdminOrModerator, searchActor);
 router.get("/latest-uploads", getLatestActors);
-router.get("/actors", isAuth, isAdmin, getActors);
+router.get("/actors", isAuth, isAdminOrModerator, getActors);
 router.get("/single/:id", getSingleActor);
 
 module.exports = router;

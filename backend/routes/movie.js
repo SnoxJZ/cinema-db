@@ -16,7 +16,12 @@ const {
 } = require("../controllers/movie");
 const { bulkImportMovies } = require("../bulkImportMovies");
 const { enrichAllActors } = require("../enrichAllActors");
-const { isAuth, isAdmin, optionalAuth } = require("../middlewares/auth");
+const {
+  isAuth,
+  isAdminOrModerator,
+  isAdmin,
+  optionalAuth,
+} = require("../middlewares/auth");
 const { uploadVideo, uploadImage } = require("../middlewares/multer");
 const {
   validateMovie,
@@ -29,14 +34,14 @@ const router = express.Router();
 router.post(
   "/upload-trailer",
   isAuth,
-  isAdmin,
+  isAdminOrModerator,
   uploadVideo.single("video"),
   uploadTrailer
 );
 router.post(
   "/create",
   isAuth,
-  isAdmin,
+  isAdminOrModerator,
   uploadImage.single("poster"),
   parseData,
   validateMovie,
@@ -44,19 +49,10 @@ router.post(
   validate,
   createMovie
 );
-// router.patch(
-//   "/update-movie-without-poster/:movieId",
-//   isAuth,
-//   isAdmin,
-//   // parseData,
-//   validateMovie,
-//   validate,
-//   updateMovieWithoutPoster
-// );
 router.patch(
   "/update/:movieId",
   isAuth,
-  isAdmin,
+  isAdminOrModerator,
   uploadImage.single("poster"),
   parseData,
   validateMovie,
@@ -64,11 +60,15 @@ router.patch(
   updateMovie
 );
 router.delete("/:movieId", isAuth, isAdmin, removeMovie);
-// router.get("/movies", isAuth, isAdmin, getMovies);
-router.get("/for-update/:movieId", isAuth, isAdmin, getMovieForUpdate);
-router.get("/search", isAuth, isAdmin, searchMovies);
-router.post("/bulk-import", bulkImportMovies);
-router.post("/enrich-all-actors", enrichAllActors);
+router.get(
+  "/for-update/:movieId",
+  isAuth,
+  isAdminOrModerator,
+  getMovieForUpdate
+);
+router.get("/search", isAuth, isAdminOrModerator, searchMovies);
+router.post("/bulk-import", isAuth, isAdmin, bulkImportMovies);
+router.post("/enrich-all-actors", isAuth, isAdmin, enrichAllActors);
 
 router.get("/movies", getMovies);
 router.get("/latest-uploads", getLatestUploads);

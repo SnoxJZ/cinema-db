@@ -44,7 +44,7 @@ export default function SearchMovies() {
   }, [query]);
 
   return (
-    <div className="space-y-3 p-5">
+    <div className="space-y-3 bg-white p-5 dark:bg-primary">
       <NotFoundText text="Not found!" visible={resultNotFound} />
       {!resultNotFound &&
         movies?.map((movie) => {

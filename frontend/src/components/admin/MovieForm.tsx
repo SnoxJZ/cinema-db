@@ -36,9 +36,11 @@ const defaultMovieInfo: MovieFormT = {
   releseDate: '',
   poster: undefined,
   genres: [],
-  type: '',
+  type: 'Movie',
   language: '',
   status: 'private' as const,
+  reviews: { ratingAvg: undefined, reviewCount: undefined },
+  isFavorite: false,
 };
 
 interface MovieFormProps {

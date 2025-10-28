@@ -15,7 +15,7 @@ interface CastInfo {
 }
 
 const defaultCastInfo: CastInfo = {
-  actor: { id: '', name: '', about: '', gender: '' },
+  actor: { apiId: 0, id: '', name: '', about: '', gender: '' },
   roleAs: '',
   leadActor: false,
 };
@@ -51,6 +51,7 @@ export default function CastForm({
       ...prev,
       actor: {
         ...prev.actor,
+        id: actor.id,
         name: actor.name,
         avatar: { url: actor.avatar, public_id: actor.id },
       },
@@ -78,7 +79,7 @@ export default function CastForm({
         data.results.map((result) => ({
           name: result.name,
           avatar: result?.avatar?.url || '',
-          id: result.avatar?.public_id || '',
+          id: result.id,
         })),
       ),
     );

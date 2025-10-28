@@ -48,6 +48,7 @@ export default function RatingForm({
       isSpoiler: false,
     };
 
+    setContent('');
     onSubmit(data);
   };
 

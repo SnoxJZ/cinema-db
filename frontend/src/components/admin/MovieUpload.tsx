@@ -86,7 +86,7 @@ export default function MovieUpload({
   };
 
   return (
-    <ModalContainer visible={visible}>
+    <ModalContainer visible={visible} onClose={onClose}>
       <div className="mb-5">
         <UploadProgress
           visible={!videoUploaded && videoSelected}
@@ -95,11 +95,13 @@ export default function MovieUpload({
         />
       </div>
       {!videoSelected ? (
-        <TrailerSelector
-          visible={!videoSelected}
-          onTypeError={handleTypeError}
-          handleChange={handleChange}
-        />
+        <div className="flex h-full flex-col items-center justify-center">
+          <TrailerSelector
+            visible={!videoSelected}
+            onTypeError={handleTypeError}
+            handleChange={handleChange}
+          />
+        </div>
       ) : (
         <MovieForm
           busy={busy}
@@ -123,7 +125,7 @@ const TrailerSelector = ({
   if (!visible) return null;
 
   return (
-    <div className="flex h-full items-center justify-center">
+    <div className="flex h-20 items-center justify-center">
       <FileUploader
         handleChange={handleChange}
         onTypeError={onTypeError}
