@@ -1,18 +1,19 @@
 import { useEffect, useState } from 'react';
 
-import { blockUser, getUsers, unblockUser } from '@/api/admin';
+import { blockUser, changeUserRole, getUsers, unblockUser } from '@/api/admin';
+import Loading from '@/components/Loading';
 import NextAndPrevButton from '@/components/NextAndPrevButton';
 import NotFoundText from '@/components/NotFoundText';
-import { useNotification } from '@/hooks';
-import type { BlockDuration, User } from '@/types';
+import { useAuth, useNotification } from '@/hooks';
+import type { BlockDuration, User, UserRole } from '@/types';
 
 const Users = () => {
   const [users, setUsers] = useState<User[] | undefined>(undefined);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
-  console.log(users);
 
+  const { isAdmin } = useAuth();
   const { updateNotification } = useNotification();
 
   const fetchUsers = async () => {
@@ -54,6 +55,21 @@ const Users = () => {
     );
   };
 
+  const handleOnChangeUserRole = async (
+    userId: string,
+    role: UserRole | undefined,
+  ) => {
+    if (!role) return;
+    const { data, error } = await changeUserRole(userId, role);
+    if (error || !data)
+      return updateNotification('error', error || 'An error occurred');
+
+    updateNotification('success', data.message);
+    setUsers((prev) =>
+      prev?.map((user) => (user.id === userId ? { ...user, role } : user)),
+    );
+  };
+
   const handleOnNextClick = () => {
     if (currentPage >= totalPages) return;
     setCurrentPage((prev) => prev + 1);
@@ -74,6 +90,8 @@ const Users = () => {
 
     return () => clearTimeout(timeoutId);
   }, [searchQuery, currentPage]);
+
+  if (!users?.length) return <Loading />;
 
   return (
     <div className="min-h-screen space-y-3 p-5 dark:bg-primary">
@@ -98,6 +116,8 @@ const Users = () => {
             key={user.id}
             onBlockUser={handleOnBlockUser}
             onUnblockUser={handleOnUnblockUser}
+            isAdmin={isAdmin}
+            onChangeUserRole={handleOnChangeUserRole}
           />
         ))}
       </div>
@@ -117,17 +137,21 @@ const UserItem = ({
   user,
   onBlockUser,
   onUnblockUser,
+  isAdmin,
+  onChangeUserRole,
 }: {
   user: User;
   onBlockUser: (userId: string, duration: BlockDuration) => void;
   onUnblockUser: (userId: string) => void;
+  isAdmin: boolean;
+  onChangeUserRole: (userId: string, role: UserRole | undefined) => void;
 }) => {
   const [duration, setDuration] = useState<BlockDuration | undefined>(
     undefined,
   );
-
+  const [role, setRole] = useState<UserRole | undefined>(user.role);
   return (
-    <div className="flex items-center justify-between">
+    <div className="flex flex-wrap items-center justify-between gap-5 border-b py-4">
       <div className="flex items-center gap-3">
         {user.avatar?.url ? (
           <img
@@ -147,9 +171,30 @@ const UserItem = ({
           <p className="text-sm text-primary dark:text-white">{user.email}</p>
         </div>
       </div>
-      <div className="flex items-center gap-3">
+      <div className="flex flex-col items-center gap-3 lg:flex-row">
+        {isAdmin && (
+          <div className="flex items-center gap-2">
+            <select
+              onChange={(e) => setRole(e.target.value as UserRole)}
+              value={role}
+              className="rounded border border-gray-300 bg-white px-4 py-2 text-sm dark:border-gray-600 dark:bg-secondary dark:text-white"
+            >
+              <option value={undefined}>Select Role</option>
+              <option value="user">User</option>
+              <option value="admin">Admin</option>
+              <option value="moderator">Moderator</option>
+            </select>
+            <button
+              type="button"
+              className="rounded bg-blue-500 px-4 py-1 text-sm text-white"
+              onClick={() => onChangeUserRole(user.id, role)}
+            >
+              Change Role
+            </button>
+          </div>
+        )}
         {!user.isBlocked ? (
-          <>
+          <div className="flex items-center gap-2">
             <select
               onChange={(e) => setDuration(e.target.value as BlockDuration)}
               value={duration}
@@ -171,9 +216,9 @@ const UserItem = ({
             >
               Block
             </button>
-          </>
+          </div>
         ) : (
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <p className="text-sm text-primary dark:text-white">
               Blocked until{' '}
               {user.blockedUntil

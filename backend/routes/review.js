@@ -14,10 +14,25 @@ const {
   validate,
   validateReplyContent,
 } = require("../middlewares/validator");
+const { logActivity } = require("../middlewares/activityLogger");
 
-router.post("/add/:movieId", isAuth, validateRatings, validate, addReview);
-router.patch("/:reviewId", isAuth, validateRatings, validate, updateReview);
-router.delete("/:reviewId", isAuth, removeReview);
+router.post(
+  "/add/:movieId",
+  isAuth,
+  validateRatings,
+  validate,
+  logActivity("create_review"),
+  addReview
+);
+router.patch(
+  "/:reviewId",
+  isAuth,
+  validateRatings,
+  validate,
+  logActivity("update_review"),
+  updateReview
+);
+router.delete("/:reviewId", isAuth, logActivity("delete_review"), removeReview);
 router.get("/get-reviews-by-movie/:movieId", getReviewsByMovie);
 router.post(
   "/add-reply/:reviewId",

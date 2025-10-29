@@ -11,6 +11,7 @@ const Movie = require("../models/movie");
 const Review = require("../models/review");
 const User = require("../models/user");
 const { isValidObjectId } = require("mongoose");
+const Actor = require("../models/actor");
 
 exports.uploadTrailer = async (req, res) => {
   const { file } = req;
@@ -599,9 +600,19 @@ exports.searchPublicMovies = async (req, res) => {
 
   if (!title.trim()) return sendError(res, "Invalid request!");
 
+  const directors = await Actor.find({
+    name: { $regex: title, $options: "i" },
+  }).select("_id");
+
+  const directorIds = directors.map((d) => d._id);
+
   const movies = await Movie.find({
-    title: { $regex: title, $options: "i" },
     status: "public",
+    $or: [
+      { title: { $regex: title, $options: "i" } },
+      { genres: { $in: [title] } },
+      { director: { $in: directorIds } },
+    ],
   });
 
   const mapMovies = async (m) => {

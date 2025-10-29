@@ -6,6 +6,7 @@ const { generateOTP, generateMailTransporter } = require("../utils/mail");
 const { sendError, generateRandomByte } = require("../utils/helper");
 const PasswordResetToken = require("../models/passwordResetToken");
 const cloudinary = require("../cloud");
+const ActivityLog = require("../models/activityLog");
 
 exports.create = async (req, res) => {
   const { name, email, password } = req.body;
@@ -213,6 +214,13 @@ exports.signIn = async (req, res) => {
   const { _id, name, role, isVerified, avatar, favorites } = user;
 
   const jwtToken = jwt.sign({ userId: _id }, process.env.JWT_SECRET);
+
+  await ActivityLog.create({
+    user: _id,
+    action: "login",
+    ip: req.ip,
+    userAgent: req.headers["user-agent"],
+  });
 
   res.json({
     user: {
@@ -443,4 +451,30 @@ exports.unblockUser = async (req, res) => {
   if (!user) return sendError(res, "User not found");
 
   res.json({ message: "User unblocked successfully", user });
+};
+
+exports.changeUserRole = async (req, res) => {
+  const { userId } = req.params;
+  const { role } = req.body;
+
+  if (!isValidObjectId(userId)) return sendError(res, "Invalid user ID");
+
+  const allowedRoles = ["user", "admin", "moderator"];
+  if (!allowedRoles.includes(role)) {
+    return sendError(res, "Invalid role");
+  }
+
+  if (userId === req.user._id.toString()) {
+    return sendError(res, "Cannot change your own role");
+  }
+
+  const user = await User.findByIdAndUpdate(
+    userId,
+    { role },
+    { new: true }
+  ).select("-password");
+
+  if (!user) return sendError(res, "User not found");
+
+  res.json({ message: "Role updated successfully", user });
 };

@@ -1,9 +1,11 @@
+export type UserRole = 'user' | 'admin' | 'moderator';
+
 export interface User {
   id: string;
   token: string;
   name: string;
   email: string;
-  role: 'admin' | 'user' | 'moderator';
+  role: UserRole;
   isVerified: boolean;
   avatar?: {
     url: string;
@@ -192,4 +194,36 @@ export interface PlaylistI {
   description?: string;
   isPublic: boolean;
   movies: MovieListItem[];
+}
+
+export type ActivityAction =
+  | 'login'
+  | 'register'
+  | 'create_review'
+  | 'delete_review'
+  | 'update_review'
+  | 'block_user'
+  | 'unblock_user'
+  | 'change_role'
+  | 'upload_avatar'
+  | 'update_profile'
+  | 'create_actor'
+  | 'update_actor'
+  | 'delete_actor'
+  | 'create_movie'
+  | 'update_movie'
+  | 'delete_movie';
+
+export interface ActivityLog {
+  id: string;
+  user: {
+    id: string;
+    name: string;
+    email: string;
+  };
+  action: ActivityAction;
+  details?: string;
+  ip?: string;
+  userAgent?: string;
+  createdAt: string;
 }

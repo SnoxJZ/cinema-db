@@ -11,6 +11,7 @@ const {
 const { isAuth, isAdminOrModerator, isAdmin } = require("../middlewares/auth");
 const { uploadImage } = require("../middlewares/multer");
 const { actorInfoValidator, validate } = require("../middlewares/validator");
+const { logActivity } = require("../middlewares/activityLogger");
 
 const router = express.Router();
 
@@ -21,6 +22,7 @@ router.post(
   uploadImage.single("avatar"),
   actorInfoValidator,
   validate,
+  logActivity("create_actor"),
   createActor
 );
 
@@ -31,10 +33,17 @@ router.post(
   uploadImage.single("avatar"),
   actorInfoValidator,
   validate,
+  logActivity("update_actor"),
   updateActor
 );
 
-router.delete("/:actorId", isAuth, isAdmin, removeActor);
+router.delete(
+  "/:actorId",
+  isAuth,
+  isAdmin,
+  logActivity("delete_actor"),
+  removeActor
+);
 router.get("/search", isAuth, isAdminOrModerator, searchActor);
 router.get("/latest-uploads", getLatestActors);
 router.get("/actors", isAuth, isAdminOrModerator, getActors);

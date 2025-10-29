@@ -12,6 +12,7 @@ import ActorUpload from './components/models/ActorUpload';
 import ScrollToTop from './components/ScrollToTop';
 import Navbar from './components/user/Navbar';
 import { useAuth } from './hooks';
+import ActivityLogs from './pages/admin/ActivityLogs';
 import Actors from './pages/admin/Actors';
 import Dashboard from './pages/admin/Dashboard';
 import Movies from './pages/admin/Movies';
@@ -32,7 +33,7 @@ import SearchMovies from './pages/public/SearchMovies';
 import SingleMovie from './pages/public/SingleMovie';
 
 export default function App() {
-  const { isPrivilegedUser } = useAuth();
+  const { isPrivilegedUser, isAdmin } = useAuth();
   const [showMovieUploadModal, setShowMovieUploadModal] = useState(false);
   const [showActorUploadModal, setShowActorUploadModal] = useState(false);
 
@@ -58,6 +59,7 @@ export default function App() {
       <Navbar />
       {isPrivilegedUser && (
         <Header
+          isAdmin={isAdmin}
           onAddMovieClick={displayMovieUploadModal}
           onAddActorClick={displayActorUploadModal}
         />
@@ -87,6 +89,7 @@ export default function App() {
             <Route path="/admin/actors" element={<Actors />} />
             <Route path="/admin/users" element={<Users />} />
             <Route path="/search" element={<AdminSearchMovies />} />
+            <Route path="/admin/activity-logs" element={<ActivityLogs />} />
           </>
         )}
 

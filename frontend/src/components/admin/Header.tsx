@@ -1,15 +1,17 @@
 import { useEffect, useRef, useState } from 'react';
 import { AiOutlinePlus, AiOutlineHome } from 'react-icons/ai';
 import { BiMoviePlay } from 'react-icons/bi';
-import { FaUser, FaUserNinja } from 'react-icons/fa';
+import { FaHistory, FaUser, FaUserNinja } from 'react-icons/fa';
 import { NavLink, useNavigate } from 'react-router-dom';
 
 import AppSearchForm from '../form/AppSearchForm';
 
 export default function Header({
+  isAdmin,
   onAddActorClick,
   onAddMovieClick,
 }: {
+  isAdmin: boolean;
   onAddActorClick: () => void;
   onAddMovieClick: () => void;
 }) {
@@ -55,6 +57,14 @@ export default function Header({
             <span>Users</span>
           </NavItem>
         </li>
+        {isAdmin && (
+          <li>
+            <NavItem to="/admin/activity-logs">
+              <FaHistory />
+              <span>Activity Logs</span>
+            </NavItem>
+          </li>
+        )}
       </ul>
       <div className="flex items-center space-x-3">
         <AppSearchForm

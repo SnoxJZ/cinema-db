@@ -29,6 +29,8 @@ const {
   validateTrailer,
 } = require("../middlewares/validator");
 const { parseData } = require("../utils/helper");
+const { logActivity } = require("../middlewares/activityLogger");
+
 const router = express.Router();
 
 router.post(
@@ -47,6 +49,7 @@ router.post(
   validateMovie,
   validateTrailer,
   validate,
+  logActivity("create_movie"),
   createMovie
 );
 router.patch(
@@ -57,9 +60,16 @@ router.patch(
   parseData,
   validateMovie,
   validate,
+  logActivity("update_movie"),
   updateMovie
 );
-router.delete("/:movieId", isAuth, isAdmin, removeMovie);
+router.delete(
+  "/:movieId",
+  isAuth,
+  isAdmin,
+  logActivity("delete_movie"),
+  removeMovie
+);
 router.get(
   "/for-update/:movieId",
   isAuth,
