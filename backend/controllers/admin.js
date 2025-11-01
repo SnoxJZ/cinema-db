@@ -18,17 +18,18 @@ exports.getAppInfo = async (req, res) => {
 exports.getMostRated = async (req, res) => {
   const movies = await Movie.aggregate(topRatedMoviesPipeline());
 
-  const mapMovies = async (m) => {
-    const reviews = await getAverageRatings(m._id);
-
-    return {
-      id: m._id,
-      title: m.title,
-      reviews: { ...reviews },
-    };
-  };
-
-  const topRatedMovies = await Promise.all(movies.map(mapMovies));
+  const topRatedMovies = await Promise.all(
+    movies.map(async (m) => {
+      const reviews = await getAverageRatings(m._id);
+      return {
+        id: m._id,
+        title: m.title,
+        poster: m.poster,
+        responsivePosters: m.responsivePosters,
+        reviews,
+      };
+    })
+  );
 
   res.json({ movies: topRatedMovies });
 };

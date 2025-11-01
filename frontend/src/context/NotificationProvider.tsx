@@ -43,7 +43,7 @@ export default function NotificationProvider({
     <NotificationContext.Provider value={{ updateNotification }}>
       {children}
       {notification && (
-        <div className="fixed bottom-4 right-4">
+        <div className="fixed bottom-4 right-4 z-[100]">
           <div className="bounce-custom rounded shadow-md shadow-gray-400">
             <p className={classes + ' px-4 py-2 font-semibold text-white'}>
               {notification}

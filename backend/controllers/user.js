@@ -39,6 +39,13 @@ exports.create = async (req, res) => {
     `,
   });
 
+  await ActivityLog.create({
+    user: newUser._id,
+    action: "register",
+    ip: req.ip,
+    userAgent: req.headers["user-agent"],
+  });
+
   res.status(201).json({
     user: {
       id: newUser._id,
@@ -79,6 +86,7 @@ exports.verifyEmail = async (req, res) => {
   });
 
   const jwtToken = jwt.sign({ userId: user._id }, process.env.JWT_SECRET);
+
   res.json({
     user: {
       id: user._id,

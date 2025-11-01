@@ -2,7 +2,6 @@ const express = require("express");
 const {
   uploadTrailer,
   createMovie,
-  updateMovieWithoutPoster,
   updateMovie,
   removeMovie,
   getMovies,

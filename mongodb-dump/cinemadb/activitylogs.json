@@ -1,0 +1,191 @@
+[{
+  "_id": {
+    "$oid": "69015830d62312933df1dea3"
+  },
+  "user": {
+    "$oid": "68ff96a2f695c3df7ef7b29c"
+  },
+  "action": "create_review",
+  "details": "{\"rating\":10,\"content\":\"Good\",\"isSpoiler\":false}",
+  "ip": "::1",
+  "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
+  "createdAt": {
+    "$date": "2025-10-28T23:56:32.404Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "690158c9d62312933df1e0d6"
+  },
+  "user": {
+    "$oid": "68ff96a2f695c3df7ef7b29c"
+  },
+  "action": "delete_review",
+  "details": "{}",
+  "ip": "::1",
+  "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
+  "createdAt": {
+    "$date": "2025-10-28T23:59:05.107Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "690158dad62312933df1e143"
+  },
+  "user": {
+    "$oid": "68ff96a2f695c3df7ef7b29c"
+  },
+  "action": "update_review",
+  "details": "{\"rating\":10,\"content\":\"10/10\",\"isSpoiler\":false}",
+  "ip": "::1",
+  "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
+  "createdAt": {
+    "$date": "2025-10-28T23:59:22.435Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69015908d62312933df1e15c"
+  },
+  "user": {
+    "$oid": "68ff96a2f695c3df7ef7b29c"
+  },
+  "action": "change_role",
+  "details": "{\"role\":\"moderator\"}",
+  "ip": "::1",
+  "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
+  "createdAt": {
+    "$date": "2025-10-29T00:00:08.587Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6901590bd62312933df1e160"
+  },
+  "user": {
+    "$oid": "68ff96a2f695c3df7ef7b29c"
+  },
+  "action": "change_role",
+  "details": "{\"role\":\"user\"}",
+  "ip": "::1",
+  "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
+  "createdAt": {
+    "$date": "2025-10-29T00:00:11.417Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69015910d62312933df1e164"
+  },
+  "user": {
+    "$oid": "68ff96a2f695c3df7ef7b29c"
+  },
+  "action": "block_user",
+  "details": "{\"duration\":\"1m\"}",
+  "ip": "::1",
+  "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
+  "createdAt": {
+    "$date": "2025-10-29T00:00:16.575Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69015912d62312933df1e168"
+  },
+  "user": {
+    "$oid": "68ff96a2f695c3df7ef7b29c"
+  },
+  "action": "unblock_user",
+  "details": "{}",
+  "ip": "::1",
+  "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
+  "createdAt": {
+    "$date": "2025-10-29T00:00:18.875Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6901592ed62312933df1e17f"
+  },
+  "user": {
+    "$oid": "68ff96a2f695c3df7ef7b29c"
+  },
+  "action": "update_profile",
+  "details": "{\"name\":\"dojec\",\"email\":\"dojec24900@dropeso.com\",\"oldPassword\":\"dojec24900\",\"newPassword\":\"dojec249001\"}",
+  "ip": "::1",
+  "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
+  "createdAt": {
+    "$date": "2025-10-29T00:00:46.005Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69015933d62312933df1e184"
+  },
+  "user": {
+    "$oid": "68ff96a2f695c3df7ef7b29c"
+  },
+  "action": "update_profile",
+  "details": "{\"name\":\"dojec\",\"email\":\"dojec24900@dropeso.com\",\"oldPassword\":\"dojec249001\",\"newPassword\":\"dojec24900\"}",
+  "ip": "::1",
+  "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
+  "createdAt": {
+    "$date": "2025-10-29T00:00:51.263Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69015945d62312933df1e195"
+  },
+  "user": {
+    "$oid": "68ff96a2f695c3df7ef7b29c"
+  },
+  "action": "update_actor",
+  "details": "{\"id\":\"68f77ed7d5a34aa5e1e6c0a6\",\"apiId\":\"2943742\",\"name\":\"Ander Lacalle1\",\"about\":\"Andoni\",\"gender\":\"male\",\"birthday\":\"Sat Feb 24 2001 01:00:00 GMT+0100 (Central European Standard Time)\"}",
+  "ip": "::1",
+  "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
+  "createdAt": {
+    "$date": "2025-10-29T00:01:09.756Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6901594ad62312933df1e19a"
+  },
+  "user": {
+    "$oid": "68ff96a2f695c3df7ef7b29c"
+  },
+  "action": "update_actor",
+  "details": "{\"id\":\"68f77ed7d5a34aa5e1e6c0a6\",\"apiId\":\"2943742\",\"name\":\"Ander Lacalle\",\"about\":\"Andoni\",\"gender\":\"male\",\"birthday\":\"Sat Feb 24 2001 01:00:00 GMT+0100 (Central European Standard Time)\"}",
+  "ip": "::1",
+  "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
+  "createdAt": {
+    "$date": "2025-10-29T00:01:14.305Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69015b09d0f83cb20d86b0b2"
+  },
+  "user": {
+    "$oid": "68ff96a2f695c3df7ef7b29c"
+  },
+  "action": "login",
+  "ip": "::1",
+  "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
+  "createdAt": {
+    "$date": "2025-10-29T00:08:41.635Z"
+  },
+  "__v": 0
+}]

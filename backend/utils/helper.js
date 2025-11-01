@@ -83,17 +83,10 @@ exports.averageRatingPipeline = (movieId) => {
 exports.relatedMovieAggregation = (tags, movieId) => {
   return [
     {
-      $lookup: {
-        from: "Movie",
-        localField: "tags",
-        foreignField: "_id",
-        as: "relatedMovies",
-      },
-    },
-    {
       $match: {
-        tags: { $in: [...tags] },
+        tags: { $in: tags },
         _id: { $ne: movieId },
+        status: "public",
       },
     },
     {
@@ -101,34 +94,23 @@ exports.relatedMovieAggregation = (tags, movieId) => {
         title: 1,
         poster: "$poster.url",
         responsivePosters: "$poster.responsive",
+        reviewStats: 1,
       },
     },
-    {
-      $limit: 6,
-    },
+    { $limit: 6 },
   ];
 };
 
 exports.topRatedMoviesPipeline = (type) => {
   const matchOptions = {
-    reviews: { $exists: true },
-    status: { $eq: "public" },
+    status: "public",
+    reviews: { $exists: true, $ne: [] },
   };
 
-  if (type) matchOptions.type = { $eq: type };
+  if (type) matchOptions.type = type;
 
   return [
-    {
-      $lookup: {
-        from: "Movie",
-        localField: "reviews",
-        foreignField: "_id",
-        as: "topRated",
-      },
-    },
-    {
-      $match: matchOptions,
-    },
+    { $match: matchOptions },
     {
       $project: {
         title: 1,
@@ -137,14 +119,8 @@ exports.topRatedMoviesPipeline = (type) => {
         reviewCount: { $size: "$reviews" },
       },
     },
-    {
-      $sort: {
-        reviewCount: -1,
-      },
-    },
-    {
-      $limit: 6,
-    },
+    { $sort: { reviewCount: -1 } },
+    { $limit: 6 },
   ];
 };
 

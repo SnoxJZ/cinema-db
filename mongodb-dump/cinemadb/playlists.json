@@ -1,0 +1,23 @@
+[{
+  "_id": {
+    "$oid": "68feb5a3742676739001a4b5"
+  },
+  "name": "Watch Later",
+  "description": "",
+  "owner": {
+    "$oid": "68eaed3425053787b00daf16"
+  },
+  "movies": [
+    {
+      "$oid": "68f77ed3d5a34aa5e1e6bff3"
+    }
+  ],
+  "isPublic": false,
+  "createdAt": {
+    "$date": "2025-10-26T23:58:27.022Z"
+  },
+  "updatedAt": {
+    "$date": "2025-10-27T01:10:02.017Z"
+  },
+  "__v": 7
+}]

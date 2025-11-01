@@ -4,13 +4,13 @@ export const ThemeContext = createContext<{ toggleTheme: () => void } | null>(
   null,
 );
 
-const defaultTheme = 'light';
-const darkTheme = 'dark';
+const defaultTheme = 'dark';
+const lightTheme = 'light';
 
 export default function ThemeProvider({ children }: { children: ReactNode }) {
   const toggleTheme = () => {
     const oldTheme = getTheme();
-    const newTheme = oldTheme === defaultTheme ? darkTheme : defaultTheme;
+    const newTheme = oldTheme === defaultTheme ? lightTheme : defaultTheme;
 
     updateTheme(newTheme, oldTheme);
   };

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { BsTrash, BsPencilSquare } from 'react-icons/bs';
 import { useParams } from 'react-router-dom';
 
-import type { Reply, Review, ReviewData, User } from '@/types';
+import type { Review, ReviewData, User } from '@/types';
 
 import {
   addReview,

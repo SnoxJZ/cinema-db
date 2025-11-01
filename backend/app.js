@@ -27,17 +27,6 @@ app.use("/*", handleNotFound);
 
 app.use(errorHandler);
 
-// app.post("/sign-in",
-//   (req, res, next) => {
-//     const { email, password } = req.body
-//     if (!email || !password)
-//       return res.json({ error: 'email-şifre uyuşmuyor!' })
-//     next()
-//   },
-//   (req, res) => {
-//     res.send("<h1>merhaba backend</h1>");
-//   });
-
 app.listen(8000, () => {
   console.log("Connected to port 8000!");
 });

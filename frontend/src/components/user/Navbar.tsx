@@ -1,12 +1,12 @@
-import { BsFillSunFill } from 'react-icons/bs';
+// import { BsFillSunFill } from 'react-icons/bs';
 import { Link, useNavigate } from 'react-router-dom';
 
-import { useAuth, useTheme } from '../../hooks';
+import { useAuth } from '../../hooks';
 import Container from '../Container';
 import AppSearchForm from '../form/AppSearchForm';
 
 export default function Navbar() {
-  const { toggleTheme } = useTheme();
+  // const { toggleTheme } = useTheme();
   const { authInfo, handleLogout } = useAuth();
   const { isLoggedIn, profile } = authInfo;
   const navigate = useNavigate();
@@ -27,14 +27,14 @@ export default function Navbar() {
           </Link>
 
           <ul className="flex items-center space-x-2 sm:space-x-4">
-            <li>
+            {/* <li>
               <button
                 onClick={toggleTheme}
                 className="rounded bg-dark-subtle p-1 text-lg dark:bg-white sm:text-2xl"
               >
                 <BsFillSunFill className="text-secondary" size={24} />
               </button>
-            </li>
+            </li> */}
             <li>
               <AppSearchForm
                 placeholder="Search..."

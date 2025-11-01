@@ -83,7 +83,7 @@ const ListItem = ({
           alt={title}
         />
       ) : (
-        <div className="max-h-[250px] w-full bg-gray-200 object-contain">
+        <div className="flex h-[250px] w-full items-center justify-center bg-gray-200 object-contain text-lg font-semibold">
           {title}
         </div>
       )}

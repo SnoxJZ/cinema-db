@@ -552,23 +552,24 @@ exports.getRelatedMovies = async (req, res) => {
   if (!isValidObjectId(movieId)) return sendError(res, "Invalid movie ID!");
 
   const movie = await Movie.findById(movieId);
+  if (!movie) return sendError(res, "Movie not found!");
 
   const movies = await Movie.aggregate(
     relatedMovieAggregation(movie.tags, movie._id)
   );
 
-  const mapMovies = async (m) => {
-    const reviews = await getAverageRatings(m._id);
-
-    return {
-      id: m._id,
-      title: m.title,
-      poster: m.poster,
-      responsivePosters: m.responsivePosters,
-      reviews: { ...reviews },
-    };
-  };
-  const relatedMovies = await Promise.all(movies.map(mapMovies));
+  const relatedMovies = await Promise.all(
+    movies.map(async (m) => {
+      const reviews = await getAverageRatings(m._id);
+      return {
+        id: m._id,
+        title: m.title,
+        poster: m.poster,
+        responsivePosters: m.responsivePosters,
+        reviews,
+      };
+    })
+  );
 
   res.json({ movies: relatedMovies });
 };
@@ -578,19 +579,18 @@ exports.getTopRatedMovies = async (req, res) => {
 
   const movies = await Movie.aggregate(topRatedMoviesPipeline(type));
 
-  const mapMovies = async (m) => {
-    const reviews = await getAverageRatings(m._id);
-
-    return {
-      id: m._id,
-      title: m.title,
-      poster: m.poster,
-      responsivePosters: m.responsivePosters,
-      reviews: { ...reviews },
-    };
-  };
-
-  const topRatedMovies = await Promise.all(movies.map(mapMovies));
+  const topRatedMovies = await Promise.all(
+    movies.map(async (m) => {
+      const reviews = await getAverageRatings(m._id);
+      return {
+        id: m._id,
+        title: m.title,
+        poster: m.poster,
+        responsivePosters: m.responsivePosters,
+        reviews,
+      };
+    })
+  );
 
   res.json({ movies: topRatedMovies });
 };
