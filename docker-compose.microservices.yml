@@ -1,0 +1,156 @@
+services:
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - VITE_API_URL=http://localhost:8000/api
+    depends_on:
+      - api-gateway
+
+  api-gateway:
+    build: ./backend-microservices/api-gateway
+    ports:
+      - "8000:8000"
+    environment:
+      - PORT=8000
+      - USER_SERVICE_URL=${USER_SERVICE_URL}
+      - MOVIE_SERVICE_URL=${MOVIE_SERVICE_URL}
+      - REVIEW_SERVICE_URL=${REVIEW_SERVICE_URL}
+      - PLAYLIST_SERVICE_URL=${PLAYLIST_SERVICE_URL}
+      - ADMIN_SERVICE_URL=${ADMIN_SERVICE_URL}
+      - ACTOR_SERVICE_URL=${ACTOR_SERVICE_URL}
+    depends_on:
+      - user-service
+      - movie-service
+      - review-service
+      - playlist-service
+      - admin-service
+      - actor-service
+
+  user-service:
+    build: ./backend-microservices/user-service
+    ports:
+      - "8001:8001"
+    environment:
+      - PORT=8001
+      - JWT_SECRET=${JWT_SECRET}
+      - MONGO_URI=${MONGO_URI_BASE}/user_service_db
+      - MAIL_TRAP_USER=${MAIL_TRAP_USER}
+      - MAIL_TRAP_PASS=${MAIL_TRAP_PASS}
+      - CLOUD_API_SECRET=${CLOUD_API_SECRET}
+      - CLOUD_API_KEY=${CLOUD_API_KEY}
+      - CLOUD_NAME=${CLOUD_NAME}
+      - CLOUD_URL=${CLOUD_URL}
+      - BASE_CLIENT_URL=${BASE_CLIENT_URL}
+      - MOVIE_SERVICE_URL=${MOVIE_SERVICE_URL}
+    depends_on:
+      - mongo-microservices
+
+  movie-service:
+    build: ./backend-microservices/movie-service
+    ports:
+      - "8002:8002"
+    environment:
+      - PORT=8002
+      - JWT_SECRET=${JWT_SECRET}
+      - MONGO_URI=${MONGO_URI_BASE}/movie_service_db
+      - CLOUD_API_SECRET=${CLOUD_API_SECRET}
+      - CLOUD_API_KEY=${CLOUD_API_KEY}
+      - CLOUD_NAME=${CLOUD_NAME}
+      - CLOUD_URL=${CLOUD_URL}
+      - TMDB_API_KEY=${TMDB_API_KEY}
+      - USER_SERVICE_URL=${USER_SERVICE_URL}
+      - ACTOR_SERVICE_URL=${ACTOR_SERVICE_URL}
+    depends_on:
+      - mongo-microservices
+      - user-service
+      - actor-service
+
+  review-service:
+    build: ./backend-microservices/review-service
+    ports:
+      - "8003:8003"
+    environment:
+      - PORT=8003
+      - JWT_SECRET=${JWT_SECRET}
+      - MONGO_URI=${MONGO_URI_BASE}/review_service_db
+      - MOVIE_SERVICE_URL=${MOVIE_SERVICE_URL}
+      - USER_SERVICE_URL=${USER_SERVICE_URL}
+    depends_on:
+      - mongo-microservices
+      - movie-service
+      - user-service
+
+  playlist-service:
+    build: ./backend-microservices/playlist-service
+    ports:
+      - "8004:8004"
+    environment:
+      - PORT=8004
+      - JWT_SECRET=${JWT_SECRET}
+      - MONGO_URI=${MONGO_URI_BASE}/playlist_service_db
+      - MOVIE_SERVICE_URL=${MOVIE_SERVICE_URL}
+      - USER_SERVICE_URL=${USER_SERVICE_URL}
+    depends_on:
+      - mongo-microservices
+      - movie-service
+      - user-service
+
+  admin-service:
+    build: ./backend-microservices/admin-service
+    ports:
+      - "8005:8005"
+    environment:
+      - PORT=8005
+      - JWT_SECRET=${JWT_SECRET}
+      - MONGO_URI=${MONGO_URI_BASE}/admin_service_db
+      - MOVIE_SERVICE_URL=${MOVIE_SERVICE_URL}
+      - USER_SERVICE_URL=${USER_SERVICE_URL}
+      - ACTOR_SERVICE_URL=${ACTOR_SERVICE_URL}
+      - REVIEW_SERVICE_URL=${REVIEW_SERVICE_URL}
+    depends_on:
+      - mongo-microservices
+      - movie-service
+      - user-service
+      - actor-service
+      - review-service
+
+  actor-service:
+    build: ./backend-microservices/actor-service
+    ports:
+      - "8006:8006"
+    environment:
+      - PORT=8006
+      - JWT_SECRET=${JWT_SECRET}
+      - MONGO_URI=${MONGO_URI_BASE}/actor_service_db
+      - CLOUD_API_SECRET=${CLOUD_API_SECRET}
+      - CLOUD_API_KEY=${CLOUD_API_KEY}
+      - CLOUD_NAME=${CLOUD_NAME}
+      - CLOUD_URL=${CLOUD_URL}
+      - USER_SERVICE_URL=${USER_SERVICE_URL}
+    depends_on:
+      - mongo-microservices
+      - user-service
+
+  mongo-microservices:
+    image: mongo:7
+    ports:
+      - "27018:27017"
+    volumes:
+      - mongo_micro_data:/data/db
+      - ./mongodb-dump:/dump
+
+  mongo-express:
+    image: mongo-express:latest
+    ports:
+      - "8081:8081"
+    environment:
+      - ME_CONFIG_MONGODB_URL=${MONGO_URI_BASE}/
+      - ME_CONFIG_BASICAUTH_USERNAME=admin
+      - ME_CONFIG_BASICAUTH_PASSWORD=${MONGO_PASS}
+    depends_on:
+      - mongo-microservices
+
+volumes:
+  mongo_micro_data:

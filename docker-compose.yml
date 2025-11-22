@@ -1,0 +1,40 @@
+services:
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - VITE_API_URL=http://localhost:8000/api
+    depends_on:
+      - backend
+
+  backend:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    environment:
+      - JWT_SECRET=${JWT_SECRET}
+      - MONGO_URI=${MONGO_URI_BASE}
+      - MAIL_TRAP_USER=${MAIL_TRAP_USER}
+      - MAIL_TRAP_PASS=${MAIL_TRAP_PASS}
+      - CLOUD_API_SECRET=${CLOUD_API_SECRET}
+      - CLOUD_API_KEY=${CLOUD_API_KEY}
+      - CLOUD_NAME=${CLOUD_NAME}
+      - CLOUD_URL=${CLOUD_URL}
+      - BASE_CLIENT_URL=${BASE_CLIENT_URL}
+      - TMDB_API_KEY=${TMDB_API_KEY}
+    depends_on:
+      - mongo
+
+  mongo:
+    image: mongo:7
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+      - ./mongodb-dump:/dump
+    environment:
+      - MONGO_INITDB_DATABASE=cinemadb
+
+volumes:
+  mongo_data:
